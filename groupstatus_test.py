@@ -34,27 +34,27 @@ connection = adba.Connection(log=True)
 
 # we can always ping to see if we can reach the server
 try:
-    connection.ping()
+	connection.ping()
 except Exception as e :
-    print(("exception msg: " + str(e)))
-    print("if we cant even ping stop right here")
-    exit()
+	print(("exception msg: " + str(e)))
+	print("if we cant even ping stop right here")
+	exit()
 
 # ok lets try to authenticate. we need username and pw for that
 try:
-    connection.auth(user, pw)
-    pass
+	connection.auth(user, pw)
+	pass
 except Exception as e :
-    print(("exception msg: " + str(e)))
+	print(("exception msg: " + str(e)))
 
 animeList = ["Bleach", "Naruto Shippuuden", "Blue Exorcist"]
 
 
 for animeName in animeList:
-    print(("########################### " + animeName + " ###########################"))
-    anime = adba.Anime(connection, name=animeName, paramsA=['aid'], load=True)
-    groups = anime.get_groups()
-    for group in groups:
-        print(("- " + str(group)))
+	print(("########################### " + animeName + " ###########################"))
+	anime = adba.Anime(connection, name=animeName, paramsA=['aid'], load=True)
+	groups = anime.get_groups()
+	for group in groups:
+		print(("- " + str(group)))
 
 connection.logout()

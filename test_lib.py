@@ -26,22 +26,22 @@ pw = ""
 filePath = ""
 
 for o,p in opts:
-    if o == '-u':
-        user = p
-    elif o == '-p':
-        pw = p
-    elif o == '-f':
-        filePath = os.path.abspath(p)
+	if o == '-u':
+		user = p
+	elif o == '-p':
+		pw = p
+	elif o == '-f':
+		filePath = os.path.abspath(p)
 
 def beep():
-    f=open('/dev/tty','w') 
-    f.write(chr(7)) 
-    f.close() 
+	f=open('/dev/tty','w') 
+	f.write(chr(7)) 
+	f.close() 
 
 def getNowString():
-    return strftime("%Y-%m-%d %H:%M:%S", localtime(time())) 
+	return strftime("%Y-%m-%d %H:%M:%S", localtime(time())) 
 
 def log_function(data,logLvl="INFO"):
-    print((getNowString()+"-"+str(logLvl)+": "+str(data)))
+	print((getNowString()+"-"+str(logLvl)+": "+str(data)))
 logwrapper = lambda x :log_function("anidb: "+str(x),"DEBUG")
 
