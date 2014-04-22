@@ -29,4 +29,4 @@ maper = AniDBMaper()
 
 
 amask = ["aid"]
-print(maper.getAnimeBitsA(amask))
+print((maper.getAnimeBitsA(amask)))

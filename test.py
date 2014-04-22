@@ -26,19 +26,19 @@ from test_lib import *
 import adba
 
 # lets see the version
-print "Version:",adba.version
+print("Version:",adba.version)
 
 # you can now get the aid / name without a connection
 # this will search the animetitles.xml that comes with this package
 # to be precise every new Anime obj will load these before a lookup on anidb 
-anime = adba.Anime(None,name="Bleach")
-print("anidbid from name: "+str(anime.aid))
+# anime = adba.Anime(None,name="Bleach")
+# print(("anidbid from name: "+str(anime.aid)))
 
-anime = adba.Anime(None,aid=2369)
-print("name from anidbid: "+str(anime.name))
+# anime = adba.Anime(None,aid=2369)
+# print(("name from anidbid: "+str(anime.name)))
 
-anime = adba.Anime(None,tvdbid=236061,name="X-Men (2011)",autoCorrectName=True)
-print("name from tvdbid or name: "+str(anime.name))
+# anime = adba.Anime(None,tvdbid=236061,name="X-Men (2011)",autoCorrectName=True)
+# print(("name from tvdbid or name: "+str(anime.name)))
 # if you want to use the anime object later with a connection you can use
 # anime.set_connection(connection)	
 
@@ -51,9 +51,9 @@ connection = adba.Connection(log=True)
 # we can always ping to see if we can reach the server
 try:
     connection.ping()
-except Exception,e :
-    print("exception msg: "+str(e))
-    print "if we cant even ping stop right here"
+except Exception as e :
+    print(("exception msg: "+str(e)))
+    print("if we cant even ping stop right here")
     exit()
 
 
@@ -61,12 +61,12 @@ except Exception,e :
 try:
     connection.auth(user, pw)
     pass
-except Exception,e :
-    print("exception msg: "+str(e))
+except Exception as e :
+    print(("exception msg: "+str(e)))
     
 group = connection.group(gname="Doki Fansubs")
 for line in group.datalines:
-    print line["shortname"]
+    print(line["shortname"])
 
 
 # we create an Episode with:
@@ -83,11 +83,11 @@ if connection.authed():
     # we now got an object that holds the info we have and the info we want
     # lets try get the data from the server
     try:
-        print("Trying to lookup "+str(filePath)+" on anidb")
+        print(("Trying to lookup "+str(filePath)+" on anidb"))
         # simply call load_data()
         episode.load_data()
-    except Exception,e :
-        print("exception msg: "+str(e))
+    except Exception as e :
+        print(("exception msg: "+str(e)))
 
 
 # lets see if we got some valid info
@@ -98,13 +98,13 @@ if connection.authed():
 #this is why i check if anidb_file_name is something before i go on
 if episode.anidb_file_name:
     # every data should be in the correct type ... list are list numbers are int and so on
-    print("Lookup successful, the anidb filename is: "+str(episode.anidb_file_name))
+    print(("Lookup successful, the anidb filename is: "+str(episode.anidb_file_name)))
 
 # allNames is set during load_data() this is a list with all names you wanted to get
 # for a episode these are the anime names !!
 if episode.allNames:
     for name in episode.allNames:
-        print u"-: "+name
+        print("-: "+name)
 
 
 # we are done we have our info in the episode object so lets logout

@@ -29,15 +29,15 @@ import adba
 
 print("--- test with name ---")
 anime = adba.Anime(None,name="Ao no Exorcist");
-print "tvdb_id:",anime.tvdb_id
-print "anidb_id:",anime.aid
+print("tvdb_id:",anime.tvdb_id)
+print("anidb_id:",anime.aid)
 
 print("--- test with aid ---")
 anime = adba.Anime(None,aid=8148);
-print "tvdb_id:",anime.tvdb_id
-print "name:",anime.name
+print("tvdb_id:",anime.tvdb_id)
+print("name:",anime.name)
 
 print("--- test with tvdbid ---")
 anime = adba.Anime(None,tvdb_id=248035);
-print "anidb_id:",anime.aid
-print "name:",anime.name
+print("anidb_id:",anime.aid)
+print("name:",anime.name)

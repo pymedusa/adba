@@ -29,7 +29,7 @@ from time import time, sleep, strftime, localtime
 
 
 # lets see the version
-print("version: " + str(adba.version))
+print(("version: " + str(adba.version)))
 connection = adba.Connection(log=logwrapper, keepAlive=True)
 
 
@@ -39,7 +39,7 @@ class ThreadLookUp(threading.Thread):
         super(ThreadLookUp, self).__init__()
         self.animeName = animeName
         self.name = "Thread - " + str(self.animeName) + " - " + str(index)
-        print(self.name + " started")
+        print((self.name + " started"))
 
     def run(self):
         if not connection.authed():
@@ -71,7 +71,7 @@ for x in range(2):
         ThreadLookUp(a, x).start()
 
 while threading.activeCount() > threadCount:
-    print "running", threading.activeCount()
+    print("running", threading.activeCount())
     sleep(3)
 
 beep()
@@ -96,7 +96,7 @@ for x in range(2):
         ThreadLookUp(a, x).start()
 
 while threading.activeCount() > threadCount:
-    print "running", threading.activeCount()
+    print("running", threading.activeCount())
     if threading.activeCount() < threadCount + 3:
         print("#####################################")
         print("Just for the hell of it authenticate while some threads run")
@@ -105,7 +105,7 @@ while threading.activeCount() > threadCount:
     sleep(3)
 
 
-print("final logout: " + str(connection.logout()))
+print(("final logout: " + str(connection.logout())))
 print("#####################################")
 print("Thank you! Thread / Stress completed!")
 print("#####################################")

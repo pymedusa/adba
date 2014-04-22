@@ -26,7 +26,7 @@ from test_lib import *
 import adba
 
 # lets see the version
-print adba.version
+print(adba.version)
 
 # make a connection object
 # log = True great for testing not so great for a running system (default is False)
@@ -35,26 +35,26 @@ connection = adba.Connection(log=True)
 # we can always ping to see if we can reach the server
 try:
     connection.ping()
-except Exception, e :
-    print("exception msg: " + str(e))
-    print "if we cant even ping stop right here"
+except Exception as e :
+    print(("exception msg: " + str(e)))
+    print("if we cant even ping stop right here")
     exit()
 
 # ok lets try to authenticate. we need username and pw for that
 try:
     connection.auth(user, pw)
     pass
-except Exception, e :
-    print("exception msg: " + str(e))
+except Exception as e :
+    print(("exception msg: " + str(e)))
 
 animeList = ["Bleach", "Naruto Shippuuden", "Blue Exorcist"]
 
 
 for animeName in animeList:
-    print("########################### " + animeName + " ###########################")
+    print(("########################### " + animeName + " ###########################"))
     anime = adba.Anime(connection, name=animeName, paramsA=['aid'], load=True)
     groups = anime.get_groups()
     for group in groups:
-        print(u"- " + str(group))
+        print(("- " + str(group)))
 
 connection.logout()

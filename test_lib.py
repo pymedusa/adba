@@ -42,6 +42,6 @@ def getNowString():
     return strftime("%Y-%m-%d %H:%M:%S", localtime(time())) 
 
 def log_function(data,logLvl="INFO"):
-    print(getNowString()+"-"+str(logLvl)+": "+str(data))
+    print((getNowString()+"-"+str(logLvl)+": "+str(data)))
 logwrapper = lambda x :log_function("anidb: "+str(x),"DEBUG")
 
