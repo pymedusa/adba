@@ -40,10 +40,10 @@ print("name from anidbid: "+str(anime.name))
 anime = adba.Anime(None,tvdbid=236061,name="X-Men (2011)",autoCorrectName=True)
 print("name from tvdbid or name: "+str(anime.name))
 # if you want to use the anime object later with a connection you can use
-# anime.set_connection(connection)
+# anime.set_connection(connection)	
 
 
-exit()
+#exit()
 # make a connection object
 # log = True great for testing not so great for a running system (default is False)
 connection = adba.Connection(log=True)
@@ -108,9 +108,9 @@ if episode.allNames:
 
 
 # we are done we have our info in the episode object so lets logout
-connection.logout()
+connection.logout(True)
 
 # the connection has a thread connected to a socket to stop the tread and free the socket we can call
-connection.close()
+#connection.close()
 # this the socket might not be free right away
 # ps calling connection.logout(True) would achieve the same
