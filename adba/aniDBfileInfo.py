@@ -43,14 +43,14 @@ def get_file_hash(filePath):
 	with open(filePath, 'rb') as f:
 		a = gen(f)
 		hashes = [md4_hash(data).digest() for data in a]
-		for i in range(len(hashes)):
-			hashes[i]=md4_hash(hashes[i]).hexdigest()
-			
-		print(hashes)
+		
 		if len(hashes) == 1:
 			return hashes[0].encode("hex")
 		else:
-			return md4_hash(bytes(reduce(lambda a,d: a + d, hashes, ""),"ASCII")).hexdigest()
+			combinedhash=bytearray()
+			for hash in (hashes):
+				combinedhash.extend(hash)
+			return md4_hash(combinedhash).hexdigest()
 			
 		
 		

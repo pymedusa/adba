@@ -87,7 +87,7 @@ class AniDBLink(threading.Thread):
     def run(self):
         while not self._quiting:
             try:
-                data = self.sock.recv(8192).decode(encoding='ASCII')
+                data = self.sock.recv(8192).decode(encoding='UTF-8')
             except socket.timeout:
                 self._handle_timeouts()
 

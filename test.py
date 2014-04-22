@@ -82,12 +82,12 @@ episode = adba.Episode(connection,filePath=filePath,
 if connection.authed():
     # we now got an object that holds the info we have and the info we want
     # lets try get the data from the server
-    try:
+    # try:
         print(("Trying to lookup "+str(filePath)+" on anidb"))
         # simply call load_data()
         episode.load_data()
-    except Exception as e :
-        print(("exception msg: "+str(e)))
+    # except Exception as e :
+        # print(("exception msg: "+str(e)))
 
 
 # lets see if we got some valid info
