@@ -1,4 +1,16 @@
+This is a fork of adba to leverage the existing UDP API code  for new features
+at inception there are 3 forks we wish to pursue
 
+
+1) a caching system for hashes such that unless the file has changed a rehash is uneccessary 
+2) session settings for anidb such to minimize requests along with caching of anidb responses
+3) a cli utility for pulling arbitrary information from anidb or adding/marking files in anidb
+4) a renaming script that will hash incoming files, add to anidb and then apply user configurable renaming rules
+
+
+
+
+Original Readme from lad1337
 this is a simple to use anidb interface
 it is based on libpyanidb by alexer !
 more info on his great work can be found here : http://wiki.anidb.net/w/UDP_Clients#libpyanidb
