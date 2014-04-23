@@ -17,6 +17,7 @@
 
 
 import hashlib
+import binascii
 import os
 import xml.etree.cElementTree as etree
 from functools import reduce
@@ -28,10 +29,11 @@ def get_file_hash(filePath):
 	if not filePath:
 		return None
 	md4 = hashlib.new('md4').copy
+	ed2kChunkSize=9728000
 
 	def gen(f):
 		while True:
-			x = f.read(9728000)
+			x = f.read(ed2kChunkSize)
 			if x: yield x
 			else: return
 
@@ -45,7 +47,8 @@ def get_file_hash(filePath):
 		hashes = [md4_hash(data).digest() for data in a]
 		
 		if len(hashes) == 1:
-			return hashes[0].encode("hex")
+			print(str(hashes[0], "ASCII")," ",hashes[0])
+			return str(binascii.hexlify(hashes[0]), "ASCII")
 		else:
 			combinedhash=bytearray()
 			for hash in (hashes):
