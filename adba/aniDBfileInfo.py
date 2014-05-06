@@ -47,7 +47,6 @@ def get_file_hash(filePath):
 		hashes = [md4_hash(data).digest() for data in a]
 		
 		if len(hashes) == 1:
-			print(str(hashes[0], "ASCII")," ",hashes[0])
 			return str(binascii.hexlify(hashes[0]), "ASCII")
 		else:
 			combinedhash=bytearray()
