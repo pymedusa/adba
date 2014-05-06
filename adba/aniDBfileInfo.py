@@ -17,7 +17,6 @@
 
 
 import hashlib
-import binascii
 import os
 import xml.etree.cElementTree as etree
 from functools import reduce
@@ -43,19 +42,19 @@ def get_file_hash(filePath):
 		return m
 
 	with open(filePath, 'rb') as f:
-		a = gen(f)
-		hashes = [md4_hash(data).digest() for data in a]
-		
-		if len(hashes) == 1:
-			return str(binascii.hexlify(hashes[0]), "ASCII")
+		FileSize=os.path.getsize(filePath)
+		#if file size is small enough the ed2k hash is the same as the md4 hash
+		if (FileSize<=ed2kChunkSize):
+			FullFile=f.read()
+			return md4_hash(FullFile).hexdigest()
 		else:
+			a = gen(f)
+			hashes = [md4_hash(data).digest() for data in a]
 			combinedhash=bytearray()
 			for hash in (hashes):
 				combinedhash.extend(hash)
 			return md4_hash(combinedhash).hexdigest()
-			
-		
-		
+
 def get_file_size(path):
 	size = os.path.getsize(path)
 	return size
