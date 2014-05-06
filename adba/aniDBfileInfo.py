@@ -17,18 +17,28 @@
 
 
 import hashlib
+import pickle
 import os
+
 import xml.etree.cElementTree as etree
 from functools import reduce
 
 
 # http://www.radicand.org/blog/orz/2010/2/21/edonkey2000-hash-in-python/
-def get_ED2K(filePath):
+def get_ED2K(filePath,forceHash=False,cacheLocation="ED2KCache.pickle"):
 	""" Returns the ed2k hash of a given file."""
 	if not filePath:
 		return None
 	md4 = hashlib.new('md4').copy
 	ed2kChunkSize=9728000
+	try:
+		get_ED2K.ED2KCache
+	except:
+		if (os.path.isfile(cacheLocation)):
+			with open(cacheLocation,'rb') as f:
+				get_ED2K.ED2KCache=pickle.load(f)
+		else:
+			get_ED2K.ED2KCache={}
 
 	def gen(f):
 		while True:
@@ -41,19 +51,42 @@ def get_ED2K(filePath):
 		m.update(data)
 		return m
 
-	with open(filePath, 'rb') as f:
-		FileSize=os.path.getsize(filePath)
-		#if file size is small enough the ed2k hash is the same as the md4 hash
-		if (FileSize<=ed2kChunkSize):
-			FullFile=f.read()
-			return md4_hash(FullFile).hexdigest()
-		else:
-			a = gen(f)
-			hashes = [md4_hash(data).digest() for data in a]
-			combinedhash=bytearray()
-			for hash in (hashes):
-				combinedhash.extend(hash)
-			return md4_hash(combinedhash).hexdigest()
+	def writeCacheToDisk():
+		try:
+			if (len(get_ED2K.ED2KCache)!=0):
+				with open(cacheLocation,'wb') as f:
+					pickle.dump(get_ED2K.ED2KCache,f,pickle.HIGHEST_PROTOCOL)
+		except:
+			print("Error occured while writing back to disk")
+		return
+
+	fileModifiedTime=os.path.getmtime(filePath)
+	fileName=os.path.basename(filePath)
+	try:
+		cachedFileModifiedTime=get_ED2K.ED2KCache[fileName][1]
+	except:
+		#if not existing in cache it will be caught by other test
+		cachedFileModifiedTime=fileModifiedTime
+		
+	if (forceHash or fileModifiedTime>cachedFileModifiedTime or fileName not in get_ED2K.ED2KCache):
+		with open(filePath, 'rb') as f:
+			FileSize=os.path.getsize(filePath)
+			#if file size is small enough the ed2k hash is the same as the md4 hash
+			if (FileSize<=ed2kChunkSize):
+				FullFile=f.read()
+				newHash=md4_hash(FullFile).hexdigest()
+			else:
+				a = gen(f)
+				hashes = [md4_hash(data).digest() for data in a]
+				combinedhash=bytearray()
+				for hash in (hashes):
+					combinedhash.extend(hash)
+				newHash=md4_hash(combinedhash).hexdigest()
+			get_ED2K.ED2KCache[fileName]=(newHash,fileModifiedTime)
+			writeCacheToDisk()
+			return newHash
+	else:
+		return get_ED2K.ED2KCache[fileName][0]
 
 def get_file_size(path):
 	size = os.path.getsize(path)
