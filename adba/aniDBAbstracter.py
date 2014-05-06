@@ -289,7 +289,7 @@ class Episode(aniDBabstractObject):
 		if not filePath:
 			return (None, None)
 		self.log("Calculating the ed2k. Please wait...")
-		ed2k = fileInfo.get_file_hash(filePath)
+		ed2k = fileInfo.get_ED2K(filePath)
 		size = fileInfo.get_file_size(filePath)
 		return (ed2k, size)
 

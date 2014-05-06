@@ -23,7 +23,7 @@ from functools import reduce
 
 
 # http://www.radicand.org/blog/orz/2010/2/21/edonkey2000-hash-in-python/
-def get_file_hash(filePath):
+def get_ED2K(filePath):
 	""" Returns the ed2k hash of a given file."""
 	if not filePath:
 		return None
