@@ -19,13 +19,13 @@
 import hashlib
 import pickle
 import os
-
+import sys
 import xml.etree.cElementTree as etree
 from functools import reduce
 
 
 # http://www.radicand.org/blog/orz/2010/2/21/edonkey2000-hash-in-python/
-def get_ED2K(filePath,forceHash=False,cacheLocation="ED2KCache.pickle"):
+def get_ED2K(filePath,forceHash=False,cacheLocation=os.path.normpath(sys.path[0] + os.sep + "ED2KCache.pickle")):
 	""" Returns the ed2k hash of a given file."""
 	if not filePath:
 		return None
