@@ -19,8 +19,9 @@ import os
 import getopt
 import pickle
 from test_lib import *
-sys.path.insert(0, './adba')
-import aniDBfileInfo as fileInfo
+from adba.aniDBfileInfo import 
+
+
 
 ####################################################
 # here starts the stuff that is interresting for you
@@ -41,12 +42,12 @@ print("Version:",adba.version)
 testRootDir=sys.argv[1]
 
 fileCount=0
-filesToHash=10
+filesToHash=400
 ED2KCache={}
 for dirPath, dirNames, fileNames in os.walk(testRootDir):
 	for fileName in fileNames:
 		currentFilePath=os.path.normpath(dirPath + os.sep + fileName)
-		eD2KHash=fileInfo.get_ED2K(currentFilePath)
+		eD2KHash=get_ED2K(currentFilePath)
 		print(currentFilePath,eD2KHash)
 		ED2KCache[fileName]=(eD2KHash)
 		fileCount+=1
