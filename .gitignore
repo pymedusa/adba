@@ -1,2 +1,7 @@
 *.pyc
 ._*
+*.swp
+*.*~
+*.mkv
+*.pickle
+user.config
