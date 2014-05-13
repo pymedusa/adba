@@ -61,6 +61,7 @@ class aniDBabstractObject(object):
 			try:
 				self.__dict__[key] = int(dataline[key])
 			except:
+				print("hi all",type(dataline[key]),dataline[key])
 				# self.__dict__[key] = str(dataline[key], "utf-8")
 				self.__dict__[key] = dataline[key]
 			key = property(lambda x: dataline[key])
@@ -283,6 +284,25 @@ class Episode(aniDBabstractObject):
 			# TODO: add the name or something
 			self.log("Added the episode to anidb")
 
+	def edit_to_mylist(self, status=None):
+		"""
+		status:
+		0    unknown    - state is unknown or the user doesn't want to provide this information (default)
+		1    on hdd    - the file is stored on hdd
+		2    on cd    - the file is stored on cd
+		3    deleted    - the file has been deleted or is not available for other reasons (i.e. reencoded)
+		
+		"""
+		if self.filePath and not (self.ed2k or self.size):
+			(self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
+
+		try:
+			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, state=status, edit=1)
+		except Exception as e:
+			self.log("exception msg: " + str(e))
+		else:
+			# TODO: add the name or something
+			self.log("Added the episode to anidb")
 
 	def _calculate_file_stuff(self, filePath):
 		if not filePath:
