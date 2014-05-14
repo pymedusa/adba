@@ -61,7 +61,6 @@ class aniDBabstractObject(object):
 			try:
 				self.__dict__[key] = int(dataline[key])
 			except:
-				print("hi all",type(dataline[key]),dataline[key])
 				# self.__dict__[key] = str(dataline[key], "utf-8")
 				self.__dict__[key] = dataline[key]
 			key = property(lambda x: dataline[key])
