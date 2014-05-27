@@ -117,23 +117,34 @@ elif args.command == 'mylistadd':
 	# First try to add the file, then try to edit
 	if connection.authed():
 		for thisFile in fileList:
-			episode = adba.Episode(connection, filePath=thisFile)
+			try:
+				episode = adba.Episode(connection, filePath=thisFile)
+			except:
+				print("ERROR: " + thisFile + " not in AniDB!")
+				continue
 			try:
 				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
 				print(thisFile + " successfully edited in AniDB MyList.")
 			except:
-				episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
-				print(thisFile + " successfully added to AniDB MyList.")
+				try:
+					episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+					print(thisFile + " successfully added to AniDB MyList.")
+				except:
+					print("ERROR: " + thisFile + " could not be added to AniDB MyList.")
 elif args.command == 'mylistdel':
 	# Delete the file
 	if connection.authed():
 		for thisFile in fileList:
-			episode = adba.Episode(connection, filePath=thisFile)
+			try:
+				episode = adba.Episode(connection, filePath=thisFile)
+			except:
+				print("ERROR: " + thisFile + " not in AniDB!")
+				continue
 			try:
 				episode.delete_from_mylist()
 				print(thisFile + " successfully removed from AniDB MyList.")
 			except:
-				print(thisFile + " could not be removed from AniDB MyList.")
+				print("ERROR: " + thisFile + " could not be removed from AniDB MyList.")
 elif args.command == 'mylistaddwithfields':
 	# Parse requested field(s)
 	requestedFields = list(args.fields.lower().split(','))
@@ -146,13 +157,20 @@ elif args.command == 'mylistaddwithfields':
 	# Add/edit the file to AniDB and print the retrieved field(s)
 	if connection.authed():
 		for thisFile in fileList:
-			episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
+			try:
+				episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
+			except:
+				print("ERROR: " + thisFile + " not in AniDB!")
+				continue
 			try:
 				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
 				print(thisFile + " successfully edited in AniDB MyList.")
 			except:
-				episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
-				print(thisFile + " successfully added to AniDB MyList.")
+				try:
+					episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+					print(thisFile + " successfully added to AniDB MyList.")
+				except:
+					print(thisFile + " could not be added to AniDB MyList.")
 			episodeDict = attrToDict(episode)
 			print("filename\t" + thisFile)
 			for field in requestedFields:
@@ -169,7 +187,11 @@ elif args.command == 'getfields':
 	# Retrieve the requested field(s)
 	if connection.authed():
 		for thisFile in fileList:
-			episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
+			try:
+				episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
+			except:
+				print("ERROR: " + thisFile + " not in AniDB!")
+				continue
 			episodeDict = attrToDict(episode)
 			print("filename\t" + thisFile)
 			for field in requestedFields:
