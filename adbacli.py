@@ -60,7 +60,7 @@ def attrToDict(obj):
 
 # Redirect sys.stdout if requested
 if args.out_file:
-	sys.stdout = open(args.out_file, 'w')
+	sys.stdout = open(args.out_file, 'w', encoding='utf-8')
 
 # Check if fields are required
 if args.command in ['mylistaddwithfields', 'getfields']:
