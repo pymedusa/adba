@@ -149,8 +149,10 @@ elif args.command == 'mylistaddwithfields':
 			episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
 			try:
 				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				print(thisFile + " successfully edited in AniDB MyList.")
 			except:
 				episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				print(thisFile + " successfully added to AniDB MyList.")
 			episodeDict = attrToDict(episode)
 			print("filename\t" + thisFile)
 			for field in requestedFields:
