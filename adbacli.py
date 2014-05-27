@@ -10,7 +10,7 @@ import pprint
 
 stateToUDP = dict(unknown=0, hdd=1, cd=2, deleted=3)
 viewedToUDP = dict(unwatched=0, watched=1)
-blacklistFields = list(('unused', 'retired', 'reserved'))
+blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated'))
 fileTypes = '.avi,.mp4,.mkv,.ogm'
 
 parser = argparse.ArgumentParser()
@@ -178,11 +178,14 @@ elif args.command == 'listfields':
 	maperFileF = list(maper.getFileMapF())
 	maperFileA = list(maper.getFileMapA())
 	allFields = maperFileF + maperFileA
-	validFields = [field for field in allFields if field not in blacklistFields]
-	print('\t'.join(validFields))
+	validFields = sorted([field for field in allFields if field not in blacklistFields])
+	print('\n'.join(validFields))
 
 # Logout if connection active
 if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields']:
 	connection.logout(True)
+
+if args.out_file:
+        sys.stdout.close()
 
 sys.exit(0)
