@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import inspect
@@ -9,17 +9,18 @@ import adba
 import pprint
 
 stateToUDP = dict(unknown=0, hdd=1, cd=2, deleted=3)
+viewedToUDP = dict(unwatched=0, watched=1)
 blacklistFields = list(('unused', 'retired', 'reserved'))
-fileTypes = '.avi,.mp4,.mkv,.ogv,.rmbv'
+fileTypes = '.avi,.mp4,.mkv,.ogm'
 
 parser = argparse.ArgumentParser()
-parser.add_argument('command', nargs=1, choices=['hash', 'mylistadd', 'getfields', 'listfields'],
-help='Command to execute. hash: Hash the file and print its ed2k hash. mylistadd: Hash the file and add it to AniDB. If the file was there, it will be updated. getfields: Hash the file and retrieve requested fields for the hashed file. listfields: Lists all the available fields that can be requested from AniDB.')
+parser.add_argument('command', nargs=1, choices=['hash', 'mylistadd', 'mylistdel', 'getfields', 'listfields'],
+help='Command to execute. hash: Hash the file and print its ed2k hash. mylistadd: Hash the file and add it to AniDB MyList. If the file was there, it will be updated. mylistdel: Hash the file and delete it from AniDB MyList. getfields: Hash the file and retrieve requested fields for the hashed file. listfields: Lists all the available fields that can be requested from AniDB.')
 parser.add_argument('args', nargs=argparse.REMAINDER,
 help='All files and/or folders to be processed.')
 parser.add_argument('--file-types', default=fileTypes,
 help='A comma delmited list of file types to be included when searching directories. Default: ' + fileTypes)
-parser.add_argument('--out-file', action='store',
+parser.add_argument('--out-file', action='store', default=None,
 help='Write output to specified file instead of STDOUT.')
 parser.add_argument('-u', '--user', action='store', default=None,
 help='User name needed to communicate with AniDB.')
@@ -29,15 +30,13 @@ parser.add_argument('--state', choices=['unknown', 'hdd', 'cd', 'deleted'], defa
 help='Sets the file state to unknown/hdd/cd/deleted. Default: hdd')
 parser.add_argument('--watched', action='store_true',
 help='Marks the file as watched.')
-parser.add_argument('--watchdate', action='store',
-help='Sets the date the file was watched.')
-parser.add_argument('--source', action='store',
+parser.add_argument('--source', action='store', default=None,
 help='Sets the file source (any string).')
-parser.add_argument('--storage', action='store',
+parser.add_argument('--storage', action='store', default=None,
 help='Sets file storage (any string).')
-parser.add_argument('--other', action='store',
+parser.add_argument('--other', action='store', default=None,
 help='Sets other remarks (any string).')
-parser.add_argument('--fields', action='store',
+parser.add_argument('--fields', action='store', default=None,
 help='A comma delimited list of fields requested from AniDB.')
 
 args = parser.parse_args()
@@ -53,6 +52,12 @@ def attrToDict(obj):
 
 # Convert state to UDP
 args.state = stateToUDP[args.state]
+
+# Convert watched to UDP
+if args.watched:
+	args.watched=viewedToUDP['watched']
+else:
+	args.watched=viewedToUDP['unwatched']
 
 # Redirect sys.stdout if requested
 if args.out_file:
@@ -71,12 +76,12 @@ for entry in list(args.args):
 				if any(os.path.splitext(filename)[1].lower() == valid for valid in validExtensions):
 					fileList.append(filename)
 
-if args.command[0] in ['hash', 'mylistadd', 'getfields']:
+if args.command[0] in ['hash', 'mylistadd', 'mylistdel', 'getfields']:
 	if len(fileList) == 0:
 		print("Files and/or directories containing valid files are required for " + args.command[0] + ".")
 		sys.exit(0)
 
-if args.command[0] in ['mylistadd', 'getfields']:
+if args.command[0] in ['mylistadd', 'mylistdel', 'getfields']:
 	if not args.user or not args.password:
 		print("User and password required for " + args.command[0] + ".")
 		sys.exit(0)
@@ -91,15 +96,27 @@ if args.command[0] == 'hash':
 	for thisFile in fileList:
 		thisED2K = adba.aniDBfileInfo.get_ED2K(thisFile, forceHash=True)
 		print(thisED2K)
-#elif args.command[0] == 'mylistadd':
-#	# First try to add the file, then try to edit
-#	if connection.authed():
-#		for thisFile in fileList:
-#			episode = adba.Episode(connection, filePath=thisFile)
-#			try:
-#				episode.my_list_edit(status=args.state)
-#			except:
-#				episode.my_list_add(status=args.state)
+elif args.command[0] == 'mylistadd':
+	# First try to add the file, then try to edit
+	if connection.authed():
+		for thisFile in fileList:
+			episode = adba.Episode(connection, filePath=thisFile)
+			try:
+				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				print(thisFile + " successfully edited in AniDB MyList.")
+			except:
+				episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				print(thisFile + " successfully added to AniDB MyList.")
+elif args.command[0] == 'mylistdel':
+	# Delete the file
+	if connection.authed():
+		for thisFile in fileList:
+			episode = adba.Episode(connection, filePath=thisFile)
+			try:
+				episode.delete_from_mylist()
+				print(thisFile + " successfully removed from AniDB MyList.")
+			except:
+				print(thisFile + " could not be removed from AniDB MyList.")
 elif args.command[0] == 'getfields':
 	# Parse requested fields
 	requestedFields = list(args.fields.lower().split(','))
@@ -113,8 +130,7 @@ elif args.command[0] == 'getfields':
 	if connection.authed():
 		print('\t'.join(requestedFields))
 		for thisFile in fileList:
-			episode = adba.Episode(connection, filePath=thisFile, paramsF=requestF, paramsA=requestA)
-			episode.load_data()
+			episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
 			episodeDict = attrToDict(episode)
 			currentFields = [str(episodeDict[field]) for field in requestedFields]
 			print('\t'.join(currentFields))

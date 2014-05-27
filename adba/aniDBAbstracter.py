@@ -263,45 +263,64 @@ class Episode(aniDBabstractObject):
 		self._build_names()
 		self.laoded = True
 
-	def add_to_mylist(self, status=None):
+	def add_to_mylist(self, state=None, viewed=None, source=None, storage=None, other=None):
 		"""
-		status:
-		0    unknown    - state is unknown or the user doesn't want to provide this information (default)
-		1    on hdd    - the file is stored on hdd
-		2    on cd    - the file is stored on cd
-		3    deleted    - the file has been deleted or is not available for other reasons (i.e. reencoded)
+		state    - the location of the file
+                viewed    - whether you have watched the file (0=unwatched,1=watched)
+                source    - where you got the file (bittorrent,dc++,ed2k,...)
+                storage    - for example the title of the cd you have this on
+                other    - other data regarding this file
 		
+		structure of state:
+                value    meaning
+                0    unknown    - state is unknown or the user doesn't want to provide this information
+                1    on hdd    - the file is stored on hdd
+                2    on cd    - the file is stored on cd
+                3    deleted    - the file has been deleted or is not available for other reasons (i.e. reencoded)
 		"""
 		if self.filePath and not (self.ed2k or self.size):
 			(self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
-
 		try:
-			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, state=status)
+			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, state=state, viewed=viewed, source=source, storage=storage, other=other)
 		except Exception as e :
 			self.log("exception msg: " + str(e))
 		else:
 			# TODO: add the name or something
 			self.log("Added the episode to anidb")
 
-	def edit_to_mylist(self, status=None):
+	def edit_to_mylist(self, state=None, viewed=None, source=None, storage=None, other=None):
 		"""
-		status:
-		0    unknown    - state is unknown or the user doesn't want to provide this information (default)
-		1    on hdd    - the file is stored on hdd
-		2    on cd    - the file is stored on cd
-		3    deleted    - the file has been deleted or is not available for other reasons (i.e. reencoded)
+		state    - the location of the file
+                viewed    - whether you have watched the file (0=unwatched,1=watched)
+                source    - where you got the file (bittorrent,dc++,ed2k,...)
+                storage    - for example the title of the cd you have this on
+                other    - other data regarding this file
 		
+		structure of state:
+                value    meaning
+                0    unknown    - state is unknown or the user doesn't want to provide this information
+                1    on hdd    - the file is stored on hdd
+                2    on cd    - the file is stored on cd
+                3    deleted    - the file has been deleted or is not available for other reasons (i.e. reencoded)
 		"""
 		if self.filePath and not (self.ed2k or self.size):
 			(self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
-
 		try:
-			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, state=status, edit=1)
+			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
 		except Exception as e:
 			self.log("exception msg: " + str(e))
 		else:
-			# TODO: add the name or something
-			self.log("Added the episode to anidb")
+			self.log("Edited the episode in anidb")
+
+	def delete_from_mylist(self):
+		if self.filePath and not (self.ed2k or self.size):
+			(self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
+		try:
+			self.aniDB.mylistdel(size=self.size, ed2k=self.ed2k)
+		except Exception as e:
+			self.log("exception msg: " + str(e))
+		else:
+                        self.log("Deleted the episode from anidb")
 
 	def _calculate_file_stuff(self, filePath):
 		if not filePath:
