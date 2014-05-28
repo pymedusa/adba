@@ -27,7 +27,7 @@ from .aniDBAbstracter import Anime, Episode
 version = 100
 
 class Connection(threading.Thread):
-	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4):
+	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4.1):
 		super(Connection, self).__init__()
 		# setting the log function
 		self.logPrivate = logPrivate
@@ -92,14 +92,19 @@ class Connection(threading.Thread):
 	def handle(self, command, callback):
 
 		self.lock.acquire()
+		
+		#the lines changing the timing of requests is being disabled due to impracticality of implementation
+		#once full session manager i.e. (one that works beyond a single run of the program)
+		#similiar code will handle this
+		
 		if self.counterAge < (time() - 120): # the last request was older then 2 min reset delay and counter
 			self.counter = 0
-			self.link.delay = 2
-		else: # something happend in the last 120 seconds
-			if self.counter < 5:
-				self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
-			elif self.counter >= 5:
-				self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
+			# self.link.delay = 2
+		# else: # something happend in the last 120 seconds
+			# if self.counter < 5:
+				# self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
+			# elif self.counter >= 5:
+				# self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
 
 		if command.command not in ('AUTH', 'PING', 'ENCRYPT'):
 			self.counterAge = time()
