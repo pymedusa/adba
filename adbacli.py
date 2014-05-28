@@ -38,6 +38,8 @@ parser.add_argument('--other', action='store', default=None,
 help='Sets other remarks (any string).')
 parser.add_argument('--fields', action='store', default=None,
 help='A comma delimited list of fields requested from AniDB.')
+parser.add_argument('--fast-command-delay', action='store_true',
+help='Specify the command delay to wait for 2.1 seconds as opposed to the default of 4.1 seconds.')
 parser.add_argument('files', nargs='*', default=[],
 help='All files and/or folders to be processed.')
 
@@ -96,7 +98,10 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 	if not args.username or not args.password:
 		print("User and password required for " + args.command + ".")
 		sys.exit(0)
-	connection = adba.Connection(log=True)
+	if args.fast_command_delay:
+		connection = adba.Connection(log=True, commandDelay=2.1)
+	else:
+		connection = adba.Connection(log=True)
 	try:
 		connection.auth(args.username, args.password)
 	except Exception as e :
