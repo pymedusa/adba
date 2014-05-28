@@ -17,6 +17,7 @@
 import threading
 from time import time, sleep, strftime, localtime
 from types import *
+import sys
 
 from .aniDBlink import AniDBLink
 from .aniDBcommands import *
@@ -34,10 +35,11 @@ class Connection(threading.Thread):
 			self.log = log
 			self.logPrivate = True # true means sensitive data will not be NOT be logged ... yeah i know oO
 		elif log:# if it something else (like True) use the own print_log
+			self.LogFileHandler=open("fullDebugLog.log",'a')
 			self.log = self.print_log
+			
 		else:# dont log at all
 			self.log = self.print_log_dummy
-
 
 		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate)
 		self.link.session = session
@@ -65,7 +67,7 @@ class Connection(threading.Thread):
 		self.counterAge = 0
 
 	def print_log(self, data):
-		print((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data)))
+		self.LogFileHandler.write((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
 
 	def print_log_dummy(self, data):
 		pass

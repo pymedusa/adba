@@ -101,7 +101,7 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 	if not args.username or not args.password:
 		print("User and password required for " + args.command + ".")
 		sys.exit(0)
-	connection = adba.Connection(log=False)
+	connection = adba.Connection(log=True)
 	try:
 		connection.auth(args.username, args.password)
 	except Exception as e :

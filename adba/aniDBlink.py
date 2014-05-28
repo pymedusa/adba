@@ -117,6 +117,7 @@ class AniDBLink(threading.Thread):
 					self.session = resp.attrs['sesskey']
 				if resp.rescode in ('209',):
 					print("sorry encryption is not supported")
+					self.log("sorry encryption is not supported")
 					raise
 					#self.crypt=aes(md5(resp.req.apipassword+resp.attrs['salt']).digest())
 				if resp.rescode in ('203', '403', '500', '501', '503', '506'):
@@ -125,6 +126,7 @@ class AniDBLink(threading.Thread):
 				if resp.rescode in ('504', '555'):
 					self.banned = True
 					print("AniDB API informs that user or client is banned:", resp.resstr)
+					self.log(("AniDB API informs that user or client is banned:", resp.resstr))
 				resp.handle()
 				if not cmd or not cmd.mode:
 					self._resp_queue(resp)
@@ -133,6 +135,7 @@ class AniDBLink(threading.Thread):
 			except:
 				sys.excepthook(*sys.exc_info())
 				print("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
+				self.log("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
 				self.sock.close()
 				try:cmd.waiter.release()
 				except:pass
