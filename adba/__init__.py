@@ -27,7 +27,7 @@ from .aniDBAbstracter import Anime, Episode
 version = 100
 
 class Connection(threading.Thread):
-	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False):
+	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4):
 		super(Connection, self).__init__()
 		# setting the log function
 		self.logPrivate = logPrivate
@@ -35,15 +35,14 @@ class Connection(threading.Thread):
 			self.log = log
 			self.logPrivate = True # true means sensitive data will not be NOT be logged ... yeah i know oO
 		elif log:# if it something else (like True) use the own print_log
-			self.LogFileHandler=open("fullDebugLog.log",'a')
+			
 			self.log = self.print_log
 			
 		else:# dont log at all
 			self.log = self.print_log_dummy
 
-		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate)
+		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate,delay=commandDelay)
 		self.link.session = session
-
 		self.clientname = clientname
 		self.clientver = version
 
@@ -67,7 +66,10 @@ class Connection(threading.Thread):
 		self.counterAge = 0
 
 	def print_log(self, data):
-		self.LogFileHandler.write((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
+		# print((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
+		LogFileHandler=open("fullDebugLog.log",'a',encoding="UTF-8")
+		LogFileHandler.write((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
+		
 
 	def print_log_dummy(self, data):
 		pass
