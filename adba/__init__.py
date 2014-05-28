@@ -17,6 +17,7 @@
 import threading
 from time import time, sleep, strftime, localtime
 from types import *
+import sys
 
 from .aniDBlink import AniDBLink
 from .aniDBcommands import *
@@ -26,7 +27,7 @@ from .aniDBAbstracter import Anime, Episode
 version = 100
 
 class Connection(threading.Thread):
-	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False):
+	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4.1):
 		super(Connection, self).__init__()
 		# setting the log function
 		self.logPrivate = logPrivate
@@ -34,14 +35,14 @@ class Connection(threading.Thread):
 			self.log = log
 			self.logPrivate = True # true means sensitive data will not be NOT be logged ... yeah i know oO
 		elif log:# if it something else (like True) use the own print_log
+			
 			self.log = self.print_log
+			
 		else:# dont log at all
 			self.log = self.print_log_dummy
 
-
-		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate)
+		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate,delay=commandDelay)
 		self.link.session = session
-
 		self.clientname = clientname
 		self.clientver = version
 
@@ -65,7 +66,10 @@ class Connection(threading.Thread):
 		self.counterAge = 0
 
 	def print_log(self, data):
-		print((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data)))
+		# print((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
+		LogFileHandler=open("fullDebugLog.log",'a',encoding="UTF-8")
+		LogFileHandler.write((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
+		
 
 	def print_log_dummy(self, data):
 		pass
@@ -88,14 +92,19 @@ class Connection(threading.Thread):
 	def handle(self, command, callback):
 
 		self.lock.acquire()
+		
+		#the lines changing the timing of requests is being disabled due to impracticality of implementation
+		#once full session manager i.e. (one that works beyond a single run of the program)
+		#similiar code will handle this
+		
 		if self.counterAge < (time() - 120): # the last request was older then 2 min reset delay and counter
 			self.counter = 0
-			self.link.delay = 2
-		else: # something happend in the last 120 seconds
-			if self.counter < 5:
-				self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
-			elif self.counter >= 5:
-				self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
+			# self.link.delay = 2
+		# else: # something happend in the last 120 seconds
+			# if self.counter < 5:
+				# self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
+			# elif self.counter >= 5:
+				# self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
 
 		if command.command not in ('AUTH', 'PING', 'ENCRYPT'):
 			self.counterAge = time()
