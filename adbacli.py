@@ -28,6 +28,8 @@ parser.add_argument('--state', choices=['unknown', 'hdd', 'cd', 'deleted'], defa
 help='Sets the file state to unknown/hdd/cd/deleted. Default: hdd')
 parser.add_argument('--watched', action='store_true',
 help='Marks the file as watched.')
+parser.add_argument('--unwatched', action='store_true',
+help='Marks the file as unwatched.')
 parser.add_argument('--source', action='store', default=None,
 help='Sets the file source (any string).')
 parser.add_argument('--storage', action='store', default=None,
@@ -49,18 +51,9 @@ fileArgs = fileParser.parse_args(otherArgs)
 
 allFiles = args.files + fileArgs.files
 
-# Function to convert an object's attributes to a dictionary for lookup
-def attrToDict(obj):
-	pr = dict()
-	for name in dir(obj):
-		value = getattr(obj, name)
-		if not name.startswith('__') and not inspect.ismethod(value):
-			pr[name] = value
-	return pr
-
 # Redirect sys.stdout if requested
 if args.out_file:
-	sys.stdout = open(args.out_file, 'w', encoding='utf-8')
+	sys.stdout = open(args.out_file, 'w', encoding='UTF-8')
 
 # Check if fields are required
 if args.command in ['mylistaddwithfields', 'getfields']:
@@ -73,9 +66,11 @@ args.state = stateToUDP[args.state]
 
 # Convert watched to UDP
 if args.watched:
-	args.watched=viewedToUDP['watched']
+	viewed = viewedToUDP['watched']
+elif args.unwatched:
+	viewed = viewedToUDP['unwatched']
 else:
-	args.watched=viewedToUDP['unwatched']
+	viewed = None
 
 # Parse positional arguments passed in and convert all to files
 fileList = list()
@@ -101,7 +96,7 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 	if not args.username or not args.password:
 		print("User and password required for " + args.command + ".")
 		sys.exit(0)
-	connection = adba.Connection(log=False)
+	connection = adba.Connection(log=True)
 	try:
 		connection.auth(args.username, args.password)
 	except Exception as e :
@@ -123,11 +118,11 @@ elif args.command == 'mylistadd':
 				print("ERROR: " + thisFile + " not in AniDB!")
 				continue
 			try:
-				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				episode.edit_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 				print(thisFile + " successfully edited in AniDB MyList.")
 			except:
 				try:
-					episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+					episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 					print(thisFile + " successfully added to AniDB MyList.")
 				except:
 					print("ERROR: " + thisFile + " could not be added to AniDB MyList.")
@@ -163,18 +158,17 @@ elif args.command == 'mylistaddwithfields':
 				print("ERROR: " + thisFile + " not in AniDB!")
 				continue
 			try:
-				episode.edit_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+				episode.edit_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 				print(thisFile + " successfully edited in AniDB MyList.")
 			except:
 				try:
-					episode.add_to_mylist(state=args.state, viewed=args.watched, source=args.source, storage=args.storage, other=args.other)
+					episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 					print(thisFile + " successfully added to AniDB MyList.")
 				except:
 					print(thisFile + " could not be added to AniDB MyList.")
-			episodeDict = attrToDict(episode)
 			print("filename\t" + thisFile)
 			for field in requestedFields:
-				print(field + "\t" + str(episodeDict[field]))
+				print(field + "\t" + str(getattr(episode, field)))
 elif args.command == 'getfields':
 	# Parse requested field(s)
 	requestedFields = list(args.fields.lower().split(','))
@@ -192,10 +186,9 @@ elif args.command == 'getfields':
 			except:
 				print("ERROR: " + thisFile + " not in AniDB!")
 				continue
-			episodeDict = attrToDict(episode)
 			print("filename\t" + thisFile)
 			for field in requestedFields:
-				print(field + "\t" + str(episodeDict[field]))
+				print(field + "\t" + str(getattr(episode, field)))
 elif args.command == 'listfields':
 	# Print all the possible field(s) that can be requested, remove blacklisted fields
 	maper = adba.aniDBmaper.AniDBMaper()
