@@ -85,7 +85,7 @@ for entry in list(allFiles):
 		for dirpath, dirnames, filenames in os.walk(entry):
 			for filename in filenames:
 				if any(os.path.splitext(filename)[1].lower() == valid for valid in validExtensions):
-					fileList.append(filename)
+					fileList.append(os.path.normpath(dirpath + os.sep + filename))
 
 # Check if files are required
 if args.command in ['hash', 'mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields']:
