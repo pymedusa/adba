@@ -306,9 +306,14 @@ class Episode(aniDBabstractObject):
 		if self.filePath and not (self.ed2k or self.size):
 			(self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
 		try:
-			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
+			EditResponse=self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
 		except Exception as e:
 			self.log("exception msg: " + str(e))
+		#handling the case that the entry is not in anidb yet, non ideal to check the string but isinstance is having issue
+		#currently raises an exception for less changes in the code, unsure if this is the ideal way to do so
+		if(EditResponse.codestr=="NO_SUCH_MYLIST_ENTRY"):
+			self.log("attempted an edit before add")
+			raise AniDBError("Attempted to edit file without adding")
 		else:
 			self.log("Edited the episode in anidb")
 
