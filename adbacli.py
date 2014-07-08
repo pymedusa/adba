@@ -174,6 +174,7 @@ elif args.command == 'mylistaddwithfields':
 			print("filename\t" + thisFile)
 			for field in requestedFields:
 				print(field + "\t" + str(getattr(episode, field)))
+			print("")
 elif args.command == 'getfields':
 	# Parse requested field(s)
 	requestedFields = list(args.fields.lower().split(','))
@@ -194,6 +195,7 @@ elif args.command == 'getfields':
 			print("filename\t" + thisFile)
 			for field in requestedFields:
 				print(field + "\t" + str(getattr(episode, field)))
+			print("")
 elif args.command == 'listfields':
 	# Print all the possible field(s) that can be requested, remove blacklisted fields
 	maper = adba.aniDBmaper.AniDBMaper()
