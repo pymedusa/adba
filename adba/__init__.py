@@ -26,6 +26,9 @@ from .aniDBAbstracter import Anime, Episode
 
 version = 100
 
+def StartLogging():
+	return
+
 class Connection(threading.Thread):
 	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4.1):
 		super(Connection, self).__init__()
