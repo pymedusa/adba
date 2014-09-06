@@ -46,7 +46,7 @@ print("Version:",adba.version)
 #exit()
 # make a connection object
 # log = True great for testing not so great for a running system (default is False)
-connection = adba.Connection(log=True)
+connection = adba.Connection()
 
 # we can always ping to see if we can reach the server
 try:

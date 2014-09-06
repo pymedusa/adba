@@ -16,6 +16,7 @@
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
 from time import time, sleep
+import logging
 from . import aniDBfileInfo as fileInfo
 import xml.etree.cElementTree as etree
 import os, re, string
@@ -35,13 +36,6 @@ class aniDBabstractObject(object):
 
 	def set_connection(self, aniDB):
 		self.aniDB = aniDB
-		if self.aniDB:
-			self.log = self.aniDB.log
-		else:
-			self.log = self._fake_log()
-
-	def _fake_log(self, x=None):
-		pass
 
 	def _fill(self, dataline):
 		for key in dataline:
@@ -283,10 +277,10 @@ class Episode(aniDBabstractObject):
 		try:
 			self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, state=state, viewed=viewed, source=source, storage=storage, other=other)
 		except Exception as e :
-			self.log("exception msg: " + str(e))
+			logging.exception("Exception: %s", e)
 		else:
 			# TODO: add the name or something
-			self.log("Added the episode to anidb")
+			logging.info("Added the episode to anidb")
 
 	def edit_to_mylist(self, state=None, viewed=None, source=None, storage=None, other=None):
 		"""
@@ -308,14 +302,14 @@ class Episode(aniDBabstractObject):
 		try:
 			EditResponse=self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
 		except Exception as e:
-			self.log("exception msg: " + str(e))
+			logging.exception("Exception: %s", e)
 		#handling the case that the entry is not in anidb yet, non ideal to check the string but isinstance is having issue
 		#currently raises an exception for less changes in the code, unsure if this is the ideal way to do so
 		if(EditResponse.codestr=="NO_SUCH_MYLIST_ENTRY"):
-			self.log("attempted an edit before add")
+			logging.info("attempted an edit before add")
 			raise AniDBError("Attempted to edit file without adding")
 		else:
-			self.log("Edited the episode in anidb")
+			logging.info("Edited the episode in anidb")
 
 	def delete_from_mylist(self):
 		if self.filePath and not (self.ed2k or self.size):
@@ -323,14 +317,14 @@ class Episode(aniDBabstractObject):
 		try:
 			self.aniDB.mylistdel(size=self.size, ed2k=self.ed2k)
 		except Exception as e:
-			self.log("exception msg: " + str(e))
+			logging.exception("Exception: %s", e)
 		else:
-                        self.log("Deleted the episode from anidb")
+			logging.info("Deleted the episode from anidb")
 
 	def _calculate_file_stuff(self, filePath):
 		if not filePath:
 			return (None, None)
-		self.log("Calculating the ed2k. Please wait...")
+		logging.info("Calculating the ed2k. Please wait...")
 		ed2k = fileInfo.get_ED2K(filePath)
 		size = fileInfo.get_file_size(filePath)
 		return (ed2k, size)

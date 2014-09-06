@@ -48,7 +48,7 @@ def StartLogging():
 
 	# create console handler with a higher log level
 	ch = logging.StreamHandler()
-	ch.setLevel(logging.DEBUG)
+	ch.setLevel(logging.ERROR)
 
 	# create formatter and add it to the console handler
 	formatter = logging.Formatter(FormatString)
@@ -70,21 +70,10 @@ def StopLogging(listener):
 	return
 
 class Connection(threading.Thread):
-	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, log=False, logPrivate=False, keepAlive=False,commandDelay=4.1):
+	def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, keepAlive=False,commandDelay=4.1):
 		super(Connection, self).__init__()
-		# setting the log function
-		self.logPrivate = logPrivate
-		if type(log) in (FunctionType, MethodType):# if we get a function or a method use that.
-			self.log = log
-			self.logPrivate = True # true means sensitive data will not be NOT be logged ... yeah i know oO
-		elif log:# if it something else (like True) use the own print_log
-			
-			self.log = self.print_log
-			
-		else:# dont log at all
-			self.log = self.print_log_dummy
 
-		self.link = AniDBLink(server, port, myport, self.log, logPrivate=self.logPrivate,delay=commandDelay)
+		self.link = AniDBLink(server, port, myport, delay=commandDelay)
 		self.link.session = session
 		self.clientname = clientname
 		self.clientver = version
@@ -108,15 +97,6 @@ class Connection(threading.Thread):
 		self.counter = 0
 		self.counterAge = 0
 
-	def print_log(self, data):
-		# print((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
-		LogFileHandler=open("fullDebugLog.log",'a',encoding="UTF-8")
-		LogFileHandler.write((strftime("%Y-%m-%d %H:%M:%S", localtime(time())) + ": " + str(data) + "\n"))
-		
-
-	def print_log_dummy(self, data):
-		pass
-
 	def stop(self):
 		self.logout(cutConnection=True)
 
@@ -126,7 +106,7 @@ class Connection(threading.Thread):
 
 	def handle_response(self, response):
 		if response.rescode in ('501', '506') and response.req.command != 'AUTH':
-			self.log("seams like the last command got a not authed error back tring to reconnect now")
+			logging.debug("seems like the last command got a not authed error back trying to reconnect now")
 			if self._reAuthenticate():
 				response.req.resp = None
 				response = self.handle(response.req, response.req.callback)
@@ -160,7 +140,7 @@ class Connection(threading.Thread):
 			if callback:
 				callback(resp)
 
-		self.log("handling(" + str(self.counter) + "-" + str(self.link.delay) + ") command " + str(command.command))
+		logging.debug("handling(" + str(self.counter) + "-" + str(self.link.delay) + ") command " + str(command.command))
 
 		#make live request
 		command.authorize(self.mode, self.link.new_tag(), self.link.session, callback_wrapper)
@@ -192,7 +172,7 @@ class Connection(threading.Thread):
 
 	def _reAuthenticate(self):
 		if self._username and self._password:
-			self.log("auto re authenticating !")
+			logging.info("auto re authenticating !")
 			resp = self.auth(self._username, self._password)
 			if resp.rescode not in ('500'):
 				return True
@@ -201,11 +181,11 @@ class Connection(threading.Thread):
 
 	def _keep_alive(self):
 		self.lastKeepAliveCheck = time()
-		self.log("auto check !")
+		logging.info("auto check !")
 		# check every 30 minutes if the session is still valid
 		# if not reauthenticate 
 		if self.lastAuth and time() - self.lastAuth > 1800:
-			self.log("auto uptime !")
+			logging.info("auto uptime !")
 			self.uptime() # this will update the self.link.session and will refresh the session if it is still alive
 
 			if self.authed(): # if we are authed we set the time
@@ -216,7 +196,7 @@ class Connection(threading.Thread):
 		# issue a ping every 20 minutes after the last package
 		# this ensures the connection will be kept alive
 		if self.link.lastpacket and time() - self.link.lastpacket > 1200:
-			self.log("auto ping !")
+			logging.info("auto ping !")
 			self.ping()
 
 
@@ -237,19 +217,19 @@ class Connection(threading.Thread):
 		mtu     - maximum transmission unit (max packet size) (default: 1400)
 		
 		"""
-		self.log("ok1")
+		logging.debug("ok1")
 		if self.keepAlive:
-			self.log("ok2")
+			logging.debug("ok2")
 			self._username = username
 			self._password = password
 			if self.is_alive() == False:
-				self.log("You wanted to keep this thing alive!")
+				logging.debug("You wanted to keep this thing alive!")
 				if self._iamALIVE == False:
-					self.log("Starting thread now...")
+					logging.info("Starting thread now...")
 					self.start()
 					self._iamALIVE = True
 				else:
-					self.log("not starting thread seams like it is already running. this must be a _reAuthenticate")
+					logging.info("not starting thread seems like it is already running. this must be a _reAuthenticate")
 
 
 		self.lastAuth = time()

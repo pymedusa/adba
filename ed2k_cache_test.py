@@ -19,7 +19,7 @@ import os
 import getopt
 import pickle
 from test_lib import *
-from adba.aniDBfileInfo import 
+from adba.aniDBfileInfo import *
 
 
 

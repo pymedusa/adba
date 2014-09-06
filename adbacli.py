@@ -102,9 +102,9 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 		print("User and password required for " + args.command + ".")
 		sys.exit(0)
 	if args.fast_command_delay:
-		connection = adba.Connection(log=True, commandDelay=2.1)
+		connection = adba.Connection(commandDelay=2.1)
 	else:
-		connection = adba.Connection(log=True)
+		connection = adba.Connection()
 	try:
 		connection.auth(args.username, args.password)
 	except Exception as e :

@@ -26,7 +26,7 @@ import threading
 
 # you only need to import the module
 import adba
-connection = adba.Connection(log=logwrapper)
+connection = adba.Connection()
 connection.auth(user, pw)
 anime = adba.Anime(connection,name="Bleach",load=True);
 anime.add_notification();

@@ -24,7 +24,7 @@ from .aniDBerrors import *
 
 
 class AniDBLink(threading.Thread):
-	def __init__(self, server, port, myport, logFunction, delay=2, timeout=20, logPrivate=False):
+	def __init__(self, server, port, myport, delay=2, timeout=20):
 		super(AniDBLink, self).__init__()
 		self.server = server
 		self.port = port
@@ -44,8 +44,6 @@ class AniDBLink(threading.Thread):
 		self.banned = False
 		self.crypt = None
 
-		self.log = logFunction
-		self.logPrivate = logPrivate
 		self._stop = threading.Event()
 		self._quiting = False
 
@@ -71,6 +69,7 @@ class AniDBLink(threading.Thread):
 
 	def disconnectSocket(self):
 		self.sock.shutdown(socket.SHUT_RD)
+		# close is not called as the garbage collection from python will handle this for us.  Calling close can also cause issues with the threaded code.
 		# self.sock.close()
 
 	def stop (self):
@@ -120,7 +119,7 @@ class AniDBLink(threading.Thread):
 					self.session = resp.attrs['sesskey']
 				if resp.rescode in ('209',):
 					logging.error("sorry encryption is not supported")
-					raise
+					raise AniDBError()
 					#self.crypt=aes(md5(resp.req.apipassword+resp.attrs['salt']).digest())
 				if resp.rescode in ('203', '403', '500', '501', '503', '506'):
 					self.session = None

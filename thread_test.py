@@ -30,7 +30,7 @@ from time import time, sleep, strftime, localtime
 
 # lets see the version
 print(("version: " + str(adba.version)))
-connection = adba.Connection(log=logwrapper, keepAlive=True)
+connection = adba.Connection(keepAlive=True)
 
 
 class ThreadLookUp(threading.Thread):
