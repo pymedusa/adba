@@ -53,6 +53,9 @@ fileArgs = fileParser.parse_args(otherArgs)
 
 allFiles = args.files + fileArgs.files
 
+# Start logging
+FileListener = adba.StartLogging()
+
 # Redirect sys.stdout if requested
 if args.out_file:
 	sys.stdout = open(args.out_file, 'w', encoding='UTF-8')
@@ -211,5 +214,7 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 
 if args.out_file:
         sys.stdout.close()
+
+adba.StopLogging(FileListener)
 
 sys.exit(0)

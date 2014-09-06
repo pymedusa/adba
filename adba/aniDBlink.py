@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import socket, sys, zlib
 from time import time, sleep
 import threading
@@ -45,9 +46,11 @@ class AniDBLink(threading.Thread):
 
 		self.log = logFunction
 		self.logPrivate = logPrivate
-
 		self._stop = threading.Event()
 		self._quiting = False
+
+		self.QuitProcessed=False
+
 		self.setDaemon(True)
 		self.start()
 
@@ -67,19 +70,17 @@ class AniDBLink(threading.Thread):
 			return False;
 
 	def disconnectSocket(self):
-		self.sock.close()
+		self.sock.shutdown(socket.SHUT_RD)
+		# self.sock.close()
 
 	def stop (self):
-		self.log("Releasing socket and stopping link thread")
+		logging.info("Releasing socket and stopping link thread")
 		self._quiting = True
 		self.disconnectSocket()
 		self._stop.set()
 
 	def stopped (self):
 		return self._stop.isSet()
-
-	def print_log(self, data):
-		print(data)
 
 	def print_log_dummy(self, data):
 		pass
@@ -90,9 +91,11 @@ class AniDBLink(threading.Thread):
 				data = self.sock.recv(8192).decode(encoding='UTF-8')
 			except socket.timeout:
 				self._handle_timeouts()
-
 				continue
-			self.log("NetIO < %s" % repr(data))
+			except OSError as e:
+				logging.exception('Exception: %s',e)
+				break
+			logging.debug("NetIO < %s" % repr(data))
 			try:
 				for i in range(2):
 					try:
@@ -100,7 +103,7 @@ class AniDBLink(threading.Thread):
 						resp = None
 						if tmp[:2] == '\x00\x00':
 							tmp = zlib.decompressobj().decompress(tmp[2:])
-							self.log("UnZip | %s" % repr(tmp))
+							logging.debug("UnZip | %s" % repr(tmp))
 						resp = ResponseResolver(tmp)
 					except:
 						sys.excepthook(*sys.exc_info())
@@ -116,8 +119,7 @@ class AniDBLink(threading.Thread):
 				if resp.rescode in ('200', '201'):
 					self.session = resp.attrs['sesskey']
 				if resp.rescode in ('209',):
-					print("sorry encryption is not supported")
-					self.log("sorry encryption is not supported")
+					logging.error("sorry encryption is not supported")
 					raise
 					#self.crypt=aes(md5(resp.req.apipassword+resp.attrs['salt']).digest())
 				if resp.rescode in ('203', '403', '500', '501', '503', '506'):
@@ -125,8 +127,7 @@ class AniDBLink(threading.Thread):
 					self.crypt = None
 				if resp.rescode in ('504', '555'):
 					self.banned = True
-					print("AniDB API informs that user or client is banned:", resp.resstr)
-					self.log(("AniDB API informs that user or client is banned:", resp.resstr))
+					logging.critical(("AniDB API informs that user or client is banned:", resp.resstr))
 				resp.handle()
 				if not cmd or not cmd.mode:
 					self._resp_queue(resp)
@@ -134,8 +135,7 @@ class AniDBLink(threading.Thread):
 					self.tags.remove(resp.restag)
 			except:
 				sys.excepthook(*sys.exc_info())
-				print("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
-				self.log("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
+				logging.error("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
 				self.sock.close()
 				try:cmd.waiter.release()
 				except:pass
@@ -143,6 +143,8 @@ class AniDBLink(threading.Thread):
 					try:cmd.waiter.release()
 					except:pass
 				sys.exit()
+		if self._quiting:
+			self.QuitProcessed=True
 
 	def _handle_timeouts(self):
 		willpop = []
@@ -192,7 +194,7 @@ class AniDBLink(threading.Thread):
 
 	def _send(self, command):
 		if self.banned:
-			self.log("NetIO | BANNED")
+			logging.debug("NetIO | BANNED")
 			raise AniDBError("Not sending, banned")
 		self._do_delay()
 		self.lastpacket = time()
@@ -200,10 +202,9 @@ class AniDBLink(threading.Thread):
 		data = command.raw_data()
 
 		self.sock.sendto(bytes(data,"ASCII"), self.target)
-		if command.command == 'AUTH' and self.logPrivate:
-			self.log("NetIO > sensitive data is not logged!")
-		else:
-			self.log("NetIO > %s" % repr(data))
+		if command.command == 'AUTH':
+			logging.debug("NetIO > sensitive data is not logged!")
+
 
 	def new_tag(self):
 		if not len(self.tags):

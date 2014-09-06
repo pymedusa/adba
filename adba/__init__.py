@@ -14,7 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
+import logging
+import logging.handlers
+import queue
 import threading
+
 from time import time, sleep, strftime, localtime
 from types import *
 import sys
@@ -27,6 +31,42 @@ from .aniDBAbstracter import Anime, Episode
 version = 100
 
 def StartLogging():
+	# set up the format string
+	FormatString='[%(asctime)s]\t%(levelname)s\t%(message)s'
+
+	# set up the queue for the threaded listener
+	que = queue.Queue(-1) # no limit on size
+	queue_handler = logging.handlers.QueueHandler(que)
+
+	# create file handler which logs even debug messages
+	fh = logging.FileHandler('Debug.log')
+	# fh = logging.StreamHandler()
+	fh.setLevel(logging.DEBUG)
+
+	# set up the listener for the file handler
+	listener= logging.handlers.QueueListener(que,fh)
+
+	# create console handler with a higher log level
+	ch = logging.StreamHandler()
+	ch.setLevel(logging.DEBUG)
+
+	# create formatter and add it to the console handler
+	formatter = logging.Formatter(FormatString)
+	ch.setFormatter(formatter)
+	fh.setFormatter(formatter)
+
+	# initialize the basic logger with the handlers
+	logging.basicConfig(handlers=[queue_handler,ch], level=logging.DEBUG)
+
+	# start listener for logging
+	listener.start()
+	logging.debug('starting up')
+	return listener
+
+def StopLogging(listener):
+	# listener.start()
+	listener.stop()
+	logging.shutdown()
 	return
 
 class Connection(threading.Thread):

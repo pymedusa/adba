@@ -17,6 +17,7 @@
 
 
 import hashlib
+import logging
 import pickle
 import os
 import sys
@@ -57,7 +58,7 @@ def get_ED2K(filePath,forceHash=False,cacheLocation=os.path.normpath(sys.path[0]
 				with open(cacheLocation,'wb') as f:
 					pickle.dump(get_ED2K.ED2KCache,f,pickle.HIGHEST_PROTOCOL)
 		except:
-			print("Error occured while writing back to disk")
+			logging.error("Error occured while writing back to disk")
 		return
 
 	fileModifiedTime=os.path.getmtime(filePath)
