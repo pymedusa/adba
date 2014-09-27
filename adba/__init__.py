@@ -246,17 +246,12 @@ class Connection(threading.Thread):
 		needauth = False
 
 		if config.getboolean('DEFAULT', 'loggedin'):
-			self.LastCommandTime = config.getfloat('DEFAULT', 'lastcommandtime')
-			TimeElapsed=time()-self.LastCommandTime
-			TimeOutDuration=timedelta(minutes=30).seconds
-			if TimeElapsed < TimeOutDuration:
-				#we are logged in and within timeout so testing connection but first set up session key
+			self.lastCommandTime = config.getfloat('DEFAULT', 'lastcommandtime')
+			timeelapsed = time() - self.lastCommandTime
+			timeoutduration = timedelta(minutes=30).seconds
+			if timeelapsed < timeoutduration:
+				# we are logged in and within timeout so set up session key and assume valid
 				self.link.session = config.get('DEFAULT', 'sessionkey')
-				try:
-					self.handle(UptimeCommand(), callback)
-					logging.debug('Valid session found, no need to re-authenticate')
-				except:
-					needauth= True
 			else:
 				needauth = True
 		else:
@@ -268,7 +263,7 @@ class Connection(threading.Thread):
 			try:
 				self.handle(AuthCommand(username, password, 3, self.clientname, self.clientver, nat, 1, 'utf8', mtu), callback)
 			except Exception as e:
-				logging.debug('Auth command with exception %s',e)
+				logging.debug('Auth command with exception %s', e)
 				return e
 			logging.debug('Successfully authenticated and recording session details')
 			config['DEFAULT'] ={'loggedin': 'yes', 'sessionkey': self.link.session, 'lastcommandtime': repr(time())}

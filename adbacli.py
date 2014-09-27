@@ -40,6 +40,8 @@ parser.add_argument('--fields', action='store', default=None,
 help='A comma delimited list of fields requested from AniDB.')
 parser.add_argument('--fast-command-delay', action='store_true',
 help='Specify the command delay to wait for 2.1 seconds as opposed to the default of 4.1 seconds.')
+parser.add_argument('--stay-logged-in', action='store_true',
+help='Specify to stay logged in to the current session, else logout by default.')
 parser.add_argument('files', nargs='*', default=[],
 help='All files and/or folders to be processed.')
 
@@ -210,7 +212,10 @@ elif args.command == 'listfields':
 
 # Logout if connection active
 if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields']:
-	connection.logout(True)
+	if args.stay_logged_in:
+		connection.stayloggedin()
+	else:
+		connection.logout()
 
 if args.out_file:
         sys.stdout.close()
