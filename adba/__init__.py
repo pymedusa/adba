@@ -14,11 +14,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
+import configparser
 import logging
 import logging.handlers
+import os
 import queue
 import threading
 
+from datetime import timedelta
 from time import time, sleep, strftime, localtime
 from types import *
 import sys
@@ -60,7 +63,7 @@ def StartLogging():
 
 	# start listener for logging
 	listener.start()
-	logging.debug('starting up')
+	# logging.debug('starting up')
 	return listener
 
 def StopLogging(listener):
@@ -81,8 +84,14 @@ class Connection(threading.Thread):
 		# from original lib 
 		self.mode = 1    #mode: 0=queue,1=unlock,2=callback
 
+		#Filename to maintain session info always in script directory
+		self.SessionFile=os.path.normpath(sys.path[0] + os.sep + "Session.cfg")
+
 		# to lock other threads out
 		self.lock = threading.RLock()
+
+		#last Command Time set to now even though no commands are sent yet
+		self.LastCommandTime=time()
 
 		# thread keep alive stuff
 		self.keepAlive = keepAlive
@@ -217,33 +226,84 @@ class Connection(threading.Thread):
 		mtu     - maximum transmission unit (max packet size) (default: 1400)
 		
 		"""
-		logging.debug("ok1")
-		if self.keepAlive:
-			logging.debug("ok2")
-			self._username = username
-			self._password = password
-			if self.is_alive() == False:
-				logging.debug("You wanted to keep this thing alive!")
-				if self._iamALIVE == False:
-					logging.info("Starting thread now...")
-					self.start()
-					self._iamALIVE = True
-				else:
-					logging.info("not starting thread seems like it is already running. this must be a _reAuthenticate")
 
+		#disabled, this code doesn't work with renovations
+		# logging.debug("ok1")
+		# if self.keepAlive:
+		# 	logging.debug("ok2")
+		# 	self._username = username
+		# 	self._password = password
+		# 	if self.is_alive() == False:
+		# 		logging.debug("You wanted to keep this thing alive!")
+		# 		if self._iamALIVE == False:
+		# 			logging.info("Starting thread now...")
+		# 			self.start()
+		# 			self._iamALIVE = True
+		# 		else:
+		# 			logging.info("not starting thread seems like it is already running. this must be a _reAuthenticate")
+		config = configparser.ConfigParser()
+		config.read(self.SessionFile)
+		needauth = False
 
-		self.lastAuth = time()
-		return self.handle(AuthCommand(username, password, 3, self.clientname, self.clientver, nat, 1, 'utf8', mtu), callback)
+		if config.getboolean('DEFAULT', 'loggedin'):
+			self.LastCommandTime = config.getfloat('DEFAULT', 'lastcommandtime')
+			TimeElapsed=time()-self.LastCommandTime
+			TimeOutDuration=timedelta(minutes=30).seconds
+			if TimeElapsed < TimeOutDuration:
+				#we are logged in and within timeout so testing connection but first set up session key
+				self.link.session = config.get('DEFAULT', 'sessionkey')
+				try:
+					self.handle(UptimeCommand(), callback)
+					logging.debug('Valid session found, no need to re-authenticate')
+				except:
+					needauth= True
+			else:
+				needauth = True
+		else:
+			needauth = True
 
-	def logout(self, cutConnection=False, callback=None):
+		if needauth:
+			self.lastAuth = time()
+			logging.debug('No valid session, so authenticating')
+			try:
+				self.handle(AuthCommand(username, password, 3, self.clientname, self.clientver, nat, 1, 'utf8', mtu), callback)
+			except Exception as e:
+				logging.debug('Auth command with exception %s',e)
+				return e
+			logging.debug('Successfully authenticated and recording session details')
+			config['DEFAULT'] ={'loggedin': 'yes', 'sessionkey': self.link.session, 'lastcommandtime': repr(time())}
+			with open(self.SessionFile, 'w') as configfile:
+				config.write(configfile)
+		return
+
+	def logout(self, cutConnection=True, callback=None):
 		"""
 		Log out from AniDB UDP API
-		
+
 		"""
 		result = self.handle(LogoutCommand(), callback)
 		if(cutConnection):
 			self.cut()
+		config = configparser.ConfigParser()
+		config.read(self.SessionFile)
+		config['DEFAULT']['loggedin'] = 'no'
+		with open(self.SessionFile, 'w') as configfile:
+			config.write(configfile)
+		logging.debug('Logging out')
 		return result
+
+	def stayloggedin(self):
+		"""
+		handles timeout constraints of the link before exiting
+		"""
+		config = configparser.ConfigParser()
+		config.read(self.SessionFile)
+		config['DEFAULT']['lastcommandtime'] = repr(time())
+		with open(self.SessionFile, 'w') as configfile:
+			config.write(configfile)
+		self.link._do_delay()
+		logging.debug('Staying logged in')
+		return
 
 	def push(self, notify, msg, buddy=None, callback=None):
 		"""
