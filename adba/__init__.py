@@ -245,17 +245,20 @@ class Connection(threading.Thread):
 		config.read(self.SessionFile)
 		needauth = False
 
-		if config.getboolean('DEFAULT', 'loggedin'):
-			self.lastCommandTime = config.getfloat('DEFAULT', 'lastcommandtime')
-			timeelapsed = time() - self.lastCommandTime
-			timeoutduration = timedelta(minutes=30).seconds
-			if timeelapsed < timeoutduration:
-				# we are logged in and within timeout so set up session key and assume valid
-				self.link.session = config.get('DEFAULT', 'sessionkey')
+		try:
+			if config.getboolean('DEFAULT', 'loggedin'):
+				self.lastCommandTime = config.getfloat('DEFAULT', 'lastcommandtime')
+				timeelapsed = time() - self.lastCommandTime
+				timeoutduration = timedelta(minutes=30).seconds
+				if timeelapsed < timeoutduration:
+					# we are logged in and within timeout so set up session key and assume valid
+					self.link.session = config.get('DEFAULT', 'sessionkey')
+				else:
+					needauth = True
 			else:
 				needauth = True
-		else:
-			needauth = True
+		except:
+				needauth = True
 
 		if needauth:
 			self.lastAuth = time()
