@@ -14,7 +14,7 @@ blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated'))
 fileTypes = '.avi,.mp4,.mkv,.ogm'
 
 parser = argparse.ArgumentParser()
-parser.add_argument('command', choices=['hash', 'mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields', 'listfields'],
+parser.add_argument('command', choices=['hash', 'mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields', 'listfields', 'logout'],
 help='Command to execute. hash: Hash the file and print its ed2k hash. mylistadd: Hash the file and add it to AniDB MyList. If the file was there, it will be updated. mylistdel: Hash the file and delete it from AniDB MyList. getfields: Hash the file and retrieve requested fields for the hashed file. listfields: Lists all the available fields that can be requested from AniDB.')
 parser.add_argument('--file-types', default=fileTypes,
 help='A comma delmited list of file types to be included when searching directories. Default: ' + fileTypes)
@@ -61,6 +61,12 @@ FileListener = adba.StartLogging()
 # Redirect sys.stdout if requested
 if args.out_file:
 	sys.stdout = open(args.out_file, 'w', encoding='UTF-8')
+
+# Issue logout of session
+if args.command == 'logout':
+	connection = adba.Connection(commandDelay=2.1)
+	connection.logout()
+	sys.exit(0)
 
 # Check if fields are required
 if args.command in ['mylistaddwithfields', 'getfields']:

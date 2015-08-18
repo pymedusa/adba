@@ -279,16 +279,20 @@ class Connection(threading.Thread):
 		Log out from AniDB UDP API
 
 		"""
-		result = self.handle(LogoutCommand(), callback)
-		if(cutConnection):
-			self.cut()
 		config = configparser.ConfigParser()
 		config.read(self.SessionFile)
-		config['DEFAULT']['loggedin'] = 'no'
-		with open(self.SessionFile, 'w') as configfile:
-			config.write(configfile)
-		logging.debug('Logging out')
-		return result
+		if config['DEFAULT']['loggedin'] == 'yes':
+			self.link.session = config.get('DEFAULT', 'sessionkey')
+			result = self.handle(LogoutCommand(), callback)
+			if(cutConnection):
+				self.cut()
+			config['DEFAULT']['loggedin'] = 'no'
+			with open(self.SessionFile, 'w') as configfile:
+				config.write(configfile)
+			logging.debug('Logging out')
+			return result
+		logging.debug('Not logging out')
+		return
 
 	def stayloggedin(self):
 		"""
