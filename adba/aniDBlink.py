@@ -92,7 +92,7 @@ class AniDBLink(threading.Thread):
 				self._handle_timeouts()
 				continue
 			except OSError as e:
-				logging.exception('Exception: %s',e)
+				logging.exception('Exception: %s', e)
 				break
 			logging.debug("NetIO < %s" % repr(data))
 			try:
@@ -104,7 +104,8 @@ class AniDBLink(threading.Thread):
 							tmp = zlib.decompressobj().decompress(tmp[2:])
 							logging.debug("UnZip | %s" % repr(tmp))
 						resp = ResponseResolver(tmp)
-					except:
+					except Exception as e:
+						logging.exception('Exception: %s', e)
 						sys.excepthook(*sys.exc_info())
 						self.crypt = None
 						self.session = None

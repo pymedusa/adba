@@ -40,8 +40,6 @@ parser.add_argument('--fields', action='store', default=None,
 help='A comma delimited list of fields requested from AniDB.')
 parser.add_argument('--fast-command-delay', action='store_true',
 help='Specify the command delay to wait for 2.1 seconds as opposed to the default of 4.1 seconds.')
-parser.add_argument('--stay-logged-in', action='store_true',
-help='Specify to stay logged in to the current session, else logout by default.')
 parser.add_argument('files', nargs='*', default=[],
 help='All files and/or folders to be processed.')
 
@@ -115,8 +113,8 @@ if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields'
 		connection = adba.Connection()
 	try:
 		connection.auth(args.username, args.password)
-	except Exception as e :
-		print(("exception msg: " + str(e)))
+	except Exception as e:
+		print('Exception: %s', e)
 
 # Execute command
 if args.command == 'hash':
@@ -130,8 +128,8 @@ elif args.command == 'mylistadd':
 		for thisFile in fileList:
 			try:
 				episode = adba.Episode(connection, filePath=thisFile)
-			except:
-				print("ERROR: " + thisFile + " not in AniDB!")
+			except Exception as e:
+				print('Exception: %s', e)
 				continue
 			try:
 				episode.edit_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
@@ -140,22 +138,24 @@ elif args.command == 'mylistadd':
 				try:
 					episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 					print(thisFile + " successfully added to AniDB MyList.")
-				except:
-					print("ERROR: " + thisFile + " could not be added to AniDB MyList.")
+				except Exception as e:
+					print('Exception: %s', e)
+					continue
 elif args.command == 'mylistdel':
 	# Delete the file
 	if connection.authed():
 		for thisFile in fileList:
 			try:
 				episode = adba.Episode(connection, filePath=thisFile)
-			except:
-				print("ERROR: " + thisFile + " not in AniDB!")
+			except Exception as e:
+				print('Exception: %s', e)
 				continue
 			try:
 				episode.delete_from_mylist()
 				print(thisFile + " successfully removed from AniDB MyList.")
-			except:
-				print("ERROR: " + thisFile + " could not be removed from AniDB MyList.")
+			except Exception as e:
+				print('Exception: %s', e)
+				continue
 elif args.command == 'mylistaddwithfields':
 	# Parse requested field(s)
 	requestedFields = list(args.fields.lower().split(','))
@@ -170,8 +170,8 @@ elif args.command == 'mylistaddwithfields':
 		for thisFile in fileList:
 			try:
 				episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
-			except:
-				print("ERROR: " + thisFile + " not in AniDB!")
+			except Exception as e:
+				print('Exception: %s', e)
 				continue
 			try:
 				episode.edit_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
@@ -180,8 +180,9 @@ elif args.command == 'mylistaddwithfields':
 				try:
 					episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
 					print(thisFile + " successfully added to AniDB MyList.")
-				except:
-					print(thisFile + " could not be added to AniDB MyList.")
+				except Exception as e:
+					print('Exception: %s', e)
+					continue
 			print("filename\t" + thisFile)
 			for field in requestedFields:
 				print(field + "\t" + str(getattr(episode, field)))
@@ -200,8 +201,8 @@ elif args.command == 'getfields':
 		for thisFile in fileList:
 			try:
 				episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
-			except:
-				print("ERROR: " + thisFile + " not in AniDB!")
+			except Exception as e:
+				print('Exception: %s', e)
 				continue
 			print("filename\t" + thisFile)
 			for field in requestedFields:
@@ -216,12 +217,7 @@ elif args.command == 'listfields':
 	validFields = sorted([field for field in allFields if field not in blacklistFields])
 	print('\n'.join(validFields))
 
-# Logout if connection active
-if args.command in ['mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields']:
-	if args.stay_logged_in:
-		connection.stayloggedin()
-	else:
-		connection.logout()
+connection.stayloggedin()
 
 if args.out_file:
         sys.stdout.close()
