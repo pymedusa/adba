@@ -6,3 +6,4 @@
 *.pickle
 *.log
 user.config
+.idea
