@@ -56,7 +56,6 @@ allFiles = args.files + fileArgs.files
 # Start logging
 FileListener = adba.StartLogging()
 
-# Redirect sys.stdout if requested
 if args.out_file:
 	sys.stdout = open(args.out_file, 'w', encoding='UTF-8')
 
