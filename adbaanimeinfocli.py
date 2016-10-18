@@ -3,6 +3,10 @@ import argparse
 import os
 import sys
 import adba
+
+
+blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated'))
+
 parser = argparse.ArgumentParser()
 parser.add_argument('command', choices=['animeinfo', 'logout'],help='Get info or log out')
 parser.add_argument('AID',help='AID of Series wishing to find info for')
@@ -32,8 +36,18 @@ try:
 	connection.auth(args.username,args.password)
 except Exception as e:
 	print('Exception: %s', e)
+	sys.exit(1)
 
+if connection.authed():
+	#try:
+	maper=adba.aniDBmaper.AniDBMaper()
+	animeMaper=[field for field in maper.getAnimeMapA() if field not in blacklistFields]
 
+	animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
+	print(repr(animeInfo))
+	#except Exception as e:
+	#	print('Exception: %s', e)
+	#	sys.exit(1)
 
 # some clean up tasks that must happen every time
 connection.stayloggedin()
