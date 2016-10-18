@@ -34,20 +34,22 @@ connection = adba.Connection()
 
 try:
 	connection.auth(args.username,args.password)
+	print('Authing to system')
 except Exception as e:
 	print('Exception: %s', e)
 	sys.exit(1)
 
 if connection.authed():
-	#try:
-	maper=adba.aniDBmaper.AniDBMaper()
-	animeMaper=[field for field in maper.getAnimeMapA() if field not in blacklistFields]
+	try:
+		maper=adba.aniDBmaper.AniDBMaper()
+		animeMaper=[field for field in maper.getAnimeMapA() if field not in blacklistFields]
 
-	animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
-	print(repr(animeInfo))
-	#except Exception as e:
-	#	print('Exception: %s', e)
-	#	sys.exit(1)
+		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA='romaji_name')
+		print(animeInfo.rawData)
+	except Exception as e:
+		print('Exception: %s', e)
+		connection.stayloggedin()
+		sys.exit(1)
 
 # some clean up tasks that must happen every time
 connection.stayloggedin()
