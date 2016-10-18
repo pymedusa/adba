@@ -116,8 +116,8 @@ class Anime(aniDBabstractObject):
 
 		if not self.aid:
 			self.aid = self._get_aid_from_xml(self.name)
-		if not self.name or autoCorrectName:
-			self.name = self._get_name_from_xml(self.aid)
+		#if not self.name or autoCorrectName:
+		#	self.name = self._get_name_from_xml(self.aid)
 
 		if not (self.name or self.aid):
 			raise ValueError
