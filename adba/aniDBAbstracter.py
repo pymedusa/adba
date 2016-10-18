@@ -145,6 +145,10 @@ class Anime(aniDBabstractObject):
 			self._fill(self.rawData.datalines[0])
 			self._builPreSequal()
 			self.laoded = True
+	def return_raw_data(self):
+		"""Returns all raw data from request"""
+		return self.rawData
+
 
 	def get_groups(self):
 		if not self.aid:
