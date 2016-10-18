@@ -24,3 +24,17 @@ if args.command == 'logout':
 	connection.logout()
 	sys.exit(0)
 
+# we now need to login to actually get the anime info
+
+connection = adba.Connection()
+
+try:
+	connection.auth(args.username,args.password)
+except Exception as e:
+	print('Exception: %s', e)
+
+
+
+# some clean up tasks that must happen every time
+connection.stayloggedin()
+adba.StopLogging(FileListener)
