@@ -8,6 +8,7 @@ import adba
 relIDtoRelation = {1:"sequel", 2:"prequel", 11:"same setting", 12:"alternative setting", 32:"alternative version",
 				   41:"music video", 42:"character", 51:"side story", 52:"parent story", 61:"summary", 62:"full story",
 				   100:"other"}
+relIDtoRelation = {key:'relation-'+value for key,value in relIDtoRelation.items()}
 blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated','category_list','category_weight_list','category_id_list','creator_id_list','character_id_list'))
 
 parser = argparse.ArgumentParser()
