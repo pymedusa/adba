@@ -50,7 +50,7 @@ if connection.authed():
 		animeMaper=[field for field in animeFieldsWanted if field not in blacklistFields]
 		#print(animeFieldsWanted)
 		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
-		print(animeInfo.rawData)
+		#print(animeInfo.rawData)
 		for field in animeMaper:
 			if field=='related_aid_list':
 				relatedDict={value: "" for key,value in relIDtoRelation.items()}
