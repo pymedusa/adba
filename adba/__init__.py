@@ -42,7 +42,7 @@ def StartLogging():
 	queue_handler = logging.handlers.QueueHandler(que)
 
 	# create file handler which logs even debug messages
-	fh = logging.FileHandler('Debug.log')
+	fh = logging.FileHandler('Debug.log',encoding='UTF-8')
 	# fh = logging.StreamHandler()
 	fh.setLevel(logging.DEBUG)
 

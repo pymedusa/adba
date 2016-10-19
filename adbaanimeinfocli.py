@@ -42,9 +42,11 @@ except Exception as e:
 if connection.authed():
 	try:
 		maper=adba.aniDBmaper.AniDBMaper()
-		animeMaper=[field for field in maper.getAnimeMapA() if field not in blacklistFields]
+		animeFieldsWanted=maper.getAnimeMapA()
+		animeFieldsWanted=animeFieldsWanted[0:10]
+		animeMaper=[field for field in animeFieldsWanted if field not in blacklistFields]
 
-		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA='romaji_name')
+		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
 		print(animeInfo.rawData)
 	except Exception as e:
 		print('Exception: %s', e)
