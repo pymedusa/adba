@@ -267,6 +267,11 @@ class Connection(threading.Thread):
 				self.handle(AuthCommand(username, password, 3, self.clientname, self.clientver, nat, 1, 'utf8', mtu), callback)
 			except Exception as e:
 				logging.debug('Auth command with exception %s', e)
+				# we force a config file with logged out to ensure a known state if an exception occurs, forcing us to log in again
+				config['DEFAULT'] = {'loggedin': 'yes', 'sessionkey': self.link.session, 'exception':str(e),
+									 'lastcommandtime': repr(time())}
+				with open(self.SessionFile, 'w') as configfile:
+					config.write(configfile)
 				return e
 			logging.debug('Successfully authenticated and recording session details')
 			config['DEFAULT'] ={'loggedin': 'yes', 'sessionkey': self.link.session, 'lastcommandtime': repr(time())}
