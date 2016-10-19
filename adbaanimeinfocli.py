@@ -34,7 +34,6 @@ connection = adba.Connection()
 
 try:
 	connection.auth(args.username,args.password)
-	print('Authing to system')
 except Exception as e:
 	print('Exception: %s', e)
 	sys.exit(1)
