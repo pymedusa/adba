@@ -26,6 +26,7 @@ if args.out_file:
 if args.command == 'logout':
 	connection = adba.Connection(commandDelay=2.1)
 	connection.logout()
+	print('Logged Out')
 	sys.exit(0)
 
 # we now need to login to actually get the anime info
@@ -47,7 +48,20 @@ if connection.authed():
 		#print(animeFieldsWanted)
 		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
 		print(animeInfo.rawData)
-		print(getattr(animeInfo,'highest_episode_number'))
+		for field in animeMaper:
+			if field=='related_aid_list':
+				relatedAids=getattr(animeInfo,field)
+				relatedAidTypes = getattr(animeInfo, field)
+				try:
+					for i in range(len(relatedAids)):
+						print(i)
+				except:
+					print(relatedAids)
+				continue
+			if field=='related_aid_type':
+				continue
+			print(field+'\t'+str(getattr(animeInfo,field)))
+		#print(getattr(animeInfo,'related_aid_list'))
 	except Exception as e:
 		print('Exception: %s', e)
 		connection.stayloggedin()
