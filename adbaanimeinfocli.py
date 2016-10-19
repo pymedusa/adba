@@ -5,6 +5,9 @@ import sys
 import adba
 
 
+relIDtoRelation = {1:"sequel", 2:"prequel", 11:"same setting", 12:"alternative setting", 32:"alternative version",
+				   41:"music video", 42:"character", 51:"side story", 52:"parent story", 61:"summary", 62:"full story",
+				   100:"other"}
 blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated','category_list','category_weight_list','category_id_list','creator_id_list','character_id_list'))
 
 parser = argparse.ArgumentParser()
@@ -50,21 +53,28 @@ if connection.authed():
 		print(animeInfo.rawData)
 		for field in animeMaper:
 			if field=='related_aid_list':
+				relatedDict={value: "" for key,value in relIDtoRelation.items()}
+
 				relatedAids=getattr(animeInfo,field)
-				relatedAidTypes = getattr(animeInfo, field)
+				relatedAidTypes = getattr(animeInfo, 'related_aid_type')
 				try:
 					for i in range(len(relatedAids)):
-						print(i)
+						relatedDict[relIDtoRelation[relatedAidTypes[i]]]=",".join(relatedAids[i],relatedDict[relIDtoRelation[relatedAidTypes[i]]])
 				except:
-					print(relatedAids)
+					relatedDict[relIDtoRelation[relatedAidTypes]]=relatedAids
+				for key in relatedDict:
+					if relatedDict[key]!="":
+						print(key+'\t'+str(relatedDict[key]))
+			elif field=='related_aid_type':
 				continue
-			if field=='related_aid_type':
+			else:
 				continue
-			print(field+'\t'+str(getattr(animeInfo,field)))
+				#print(field+'\t'+str(getattr(animeInfo,field)))
 		#print(getattr(animeInfo,'related_aid_list'))
 	except Exception as e:
-		print('Exception: %s', e)
 		connection.stayloggedin()
+		print('Exception: %s', e)
+		raise
 		sys.exit(1)
 
 # some clean up tasks that must happen every time
