@@ -5,7 +5,7 @@ import sys
 import adba
 
 
-blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated'))
+blacklistFields = list(('unused', 'retired', 'reserved', 'IsDeprecated','category_list','category_weight_list','category_id_list','creator_id_list','character_id_list'))
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command', choices=['animeinfo', 'logout'],help='Get info or log out')
@@ -43,11 +43,12 @@ if connection.authed():
 	try:
 		maper=adba.aniDBmaper.AniDBMaper()
 		animeFieldsWanted=maper.getAnimeMapA()
-		animeFieldsWanted=animeFieldsWanted[0:10]
+		#animeFieldsWanted=animeFieldsWanted[0:-1]
 		animeMaper=[field for field in animeFieldsWanted if field not in blacklistFields]
-
+		#print(animeFieldsWanted)
 		animeInfo=adba.Anime(connection,aid=args.AID,load=True,paramsA=animeMaper)
 		print(animeInfo.rawData)
+		print(getattr(animeInfo,'highest_episode_number'))
 	except Exception as e:
 		print('Exception: %s', e)
 		connection.stayloggedin()
