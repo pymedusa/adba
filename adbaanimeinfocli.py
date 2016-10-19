@@ -59,7 +59,12 @@ if connection.authed():
 				relatedAidTypes = getattr(animeInfo, 'related_aid_type')
 				try:
 					for i in range(len(relatedAids)):
-						relatedDict[relIDtoRelation[relatedAidTypes[i]]]=",".join(relatedAids[i],relatedDict[relIDtoRelation[relatedAidTypes[i]]])
+						curID=relatedAids[i]
+						curRelation=relIDtoRelation[relatedAidTypes[i]]
+						if relatedDict[curRelation]=="":
+							relatedDict[curRelation]=str(curID)
+						else:
+							relatedDict[curRelation]=",".join([relatedDict[curRelation],str(curID)])
 				except:
 					relatedDict[relIDtoRelation[relatedAidTypes]]=relatedAids
 				for key in relatedDict:
@@ -68,8 +73,7 @@ if connection.authed():
 			elif field=='related_aid_type':
 				continue
 			else:
-				continue
-				#print(field+'\t'+str(getattr(animeInfo,field)))
+				print(field+'\t'+str(getattr(animeInfo,field)))
 		#print(getattr(animeInfo,'related_aid_list'))
 	except Exception as e:
 		connection.stayloggedin()
