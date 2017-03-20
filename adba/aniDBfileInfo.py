@@ -36,7 +36,7 @@ def get_ED2K(filePath, forceHash=False, cacheLocation=os.path.normpath(sys.path[
     try:
         get_ED2K.ED2KCache
     except:
-        if (os.path.isfile(cacheLocation)):
+        if os.path.isfile(cacheLocation):
             with open(cacheLocation, 'rb') as f:
                 get_ED2K.ED2KCache = pickle.load(f)
         else:
@@ -57,7 +57,7 @@ def get_ED2K(filePath, forceHash=False, cacheLocation=os.path.normpath(sys.path[
 
     def writeCacheToDisk():
         try:
-            if (len(get_ED2K.ED2KCache) != 0):
+            if len(get_ED2K.ED2KCache) != 0:
                 with open(cacheLocation, 'wb') as f:
                     pickle.dump(get_ED2K.ED2KCache, f, pickle.HIGHEST_PROTOCOL)
         except:
@@ -72,18 +72,18 @@ def get_ED2K(filePath, forceHash=False, cacheLocation=os.path.normpath(sys.path[
         # if not existing in cache it will be caught by other test
         cached_file_modified_time = file_modified_time
 
-    if (forceHash or file_modified_time > cached_file_modified_time or file_name not in get_ED2K.ED2KCache):
+    if forceHash or file_modified_time > cached_file_modified_time or file_name not in get_ED2K.ED2KCache:
         with open(filePath, 'rb') as f:
             file_size = os.path.getsize(filePath)
             # if file size is small enough the ed2k hash is the same as the md4 hash
-            if (file_size <= ed2k_chunk_size):
+            if file_size <= ed2k_chunk_size:
                 full_file = f.read()
                 new_hash = md4_hash(full_file).hexdigest()
             else:
                 a = gen(f)
                 hashes = [md4_hash(data).digest() for data in a]
                 combinedhash = bytearray()
-                for hash in (hashes):
+                for hash in hashes:
                     combinedhash.extend(hash)
                 new_hash = md4_hash(combinedhash).hexdigest()
             get_ED2K.ED2KCache[file_name] = (new_hash, file_modified_time)

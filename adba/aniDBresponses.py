@@ -752,7 +752,7 @@ class NotificationAddedResponse(Response):
         Response.__init__(self, cmd, restag, rescode, resstr, datalines)
         self.codestr = 'NOTIFICATION_ITEM_ADDED'
         self.codehead = ()
-        self.codetail = ('nid')
+        self.codetail = 'nid'
         self.coderep = ()
 
 
@@ -768,7 +768,7 @@ class NotificationUpdatedResponse(Response):
         Response.__init__(self, cmd, restag, rescode, resstr, datalines)
         self.codestr = 'NOTIFICATION_ITEM_UPDATED'
         self.codehead = ()
-        self.codetail = ('nid')
+        self.codetail = 'nid'
         self.coderep = ()
 
 

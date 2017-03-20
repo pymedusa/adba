@@ -93,7 +93,7 @@ class aniDBabstractObject(object):
         priority - low = 0, medium = 1, high = 2 (unconfirmed)
 
         """
-        if (self.aid):
+        if self.aid:
             self.aniDB.notifyadd(aid=self.aid, type=1, priority=1)
 
 
@@ -305,7 +305,7 @@ class Episode(aniDBabstractObject):
             logging.exception("Exception: %s", e)
         # handling the case that the entry is not in anidb yet, non ideal to check the string but isinstance is having issue
         # currently raises an exception for less changes in the code, unsure if this is the ideal way to do so
-        if (edit_response.codestr == "NO_SUCH_MYLIST_ENTRY"):
+        if edit_response.codestr == "NO_SUCH_MYLIST_ENTRY":
             logging.info("attempted an edit before add")
             raise AniDBError("Attempted to edit file without adding")
         else:
@@ -323,8 +323,8 @@ class Episode(aniDBabstractObject):
 
     def _calculate_file_stuff(self, filePath):
         if not filePath:
-            return (None, None)
+            return None, None
         logging.info("Calculating the ed2k. Please wait...")
         ed2k = fileInfo.get_ED2K(filePath)
         size = fileInfo.get_file_size(filePath)
-        return (ed2k, size)
+        return ed2k, size

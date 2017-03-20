@@ -184,7 +184,7 @@ class Connection(threading.Thread):
         if self._username and self._password:
             logging.info("auto re authenticating !")
             resp = self.auth(self._username, self._password)
-            if resp.rescode not in ('500'):
+            if resp.rescode not in '500':
                 return True
         else:
             return False
@@ -288,7 +288,7 @@ class Connection(threading.Thread):
         if config['DEFAULT']['loggedin'] == 'yes':
             self.link.session = config.get('DEFAULT', 'sessionkey')
             result = self.handle(LogoutCommand(), callback)
-            if (cutConnection):
+            if cutConnection:
                 self.cut()
             config['DEFAULT']['loggedin'] = 'no'
             with open(self.SessionFile, 'w') as configfile:

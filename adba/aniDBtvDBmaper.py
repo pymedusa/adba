@@ -21,7 +21,7 @@ import xml.etree.cElementTree as etree
 from . import aniDBfileInfo as fileInfo
 
 
-class TvDBMap():
+class TvDBMap:
     def __init__(self, filePath=None):
         self.xmlMap = fileInfo.read_tvdb_map_xml(filePath)
 
@@ -52,10 +52,10 @@ class TvDBMap():
             if int(anime.get("anidbid", False)) == anidb_id:
                 default_season = int(anime.get("defaulttvdbseason", 1))
 
-        return (season, episode)
+        return season, episode
 
     def get_season_episode_for_tvdb_absoluteNumber(self, anidb_id, absoluteNumber):
         # TODO: implement
         season = 0
         episode = 0
-        return (season, episode)
+        return season, episode

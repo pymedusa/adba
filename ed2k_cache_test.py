@@ -48,11 +48,11 @@ for dirPath, dirNames, fileNames in os.walk(testRootDir):
         currentFilePath = os.path.normpath(dirPath + os.sep + fileName)
         eD2KHash = get_ED2K(currentFilePath)
         print(currentFilePath, eD2KHash)
-        ED2KCache[fileName] = (eD2KHash)
+        ED2KCache[fileName] = eD2KHash
         fileCount += 1
-        if (fileCount > filesToHash):
+        if fileCount > filesToHash:
             break
-    if (fileCount > filesToHash):
+    if fileCount > filesToHash:
         break
 
 for key in ED2KCache:
