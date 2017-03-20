@@ -369,12 +369,12 @@ class FileResponse(Response):
         fmask = cmd.parameters['fmask']
         amask = cmd.parameters['amask']
 
-        codeListF = self.maper.getFileCodesF(fmask)
-        codeListA = self.maper.getFileCodesA(amask)
-        # print "File - codelistF: "+str(codeListF)
-        # print "File - codelistA: "+str(codeListA)
+        code_list_f = self.maper.getFileCodesF(fmask)
+        code_list_a = self.maper.getFileCodesA(amask)
+        # print "File - codelistF: "+str(code_list_f)
+        # print "File - codelistA: "+str(code_list_a)
 
-        self.codetail = tuple(['fid'] + codeListF + codeListA)
+        self.codetail = tuple(['fid'] + code_list_f + code_list_a)
 
 
 class MylistResponse(Response):
@@ -442,8 +442,8 @@ class AnimeResponse(Response):
 
         # TODO: impl random anime
         amask = cmd.parameters['amask']
-        codeList = self.maper.getAnimeCodesA(amask)
-        self.codetail = tuple(codeList)
+        code_list = self.maper.getAnimeCodesA(amask)
+        self.codetail = tuple(code_list)
 
 
 class AnimeBestMatchResponse(Response):
@@ -752,7 +752,7 @@ class NotificationAddedResponse(Response):
         Response.__init__(self, cmd, restag, rescode, resstr, datalines)
         self.codestr = 'NOTIFICATION_ITEM_ADDED'
         self.codehead = ()
-        self.codetail = ('nid')
+        self.codetail = 'nid'
         self.coderep = ()
 
 
@@ -768,7 +768,7 @@ class NotificationUpdatedResponse(Response):
         Response.__init__(self, cmd, restag, rescode, resstr, datalines)
         self.codestr = 'NOTIFICATION_ITEM_UPDATED'
         self.codehead = ()
-        self.codetail = ('nid')
+        self.codetail = 'nid'
         self.coderep = ()
 
 

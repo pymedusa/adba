@@ -43,12 +43,12 @@ class ThreadLookUp(threading.Thread):
     def run(self):
         if not connection.authed():
             log_function("authenticating in thread: " + self.getName())
-            if (user and pw):
+            if user and pw:
                 connection.auth(user, pw)
         else:
             log_function(self.name + "no need to authenticate some one else did it")
 
-        if (self.animeName != ""):
+        if self.animeName != "":
             anime = adba.Anime(connection, name=self.animeName, paramsA=['aid'])
             anime.load_data()
             log_function("the id to " + self.animeName + " is " + str(anime.aid))

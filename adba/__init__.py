@@ -36,7 +36,7 @@ version = 100
 
 def StartLogging():
     # set up the format string
-    FormatString = '[%(asctime)s]\t%(levelname)s\t%(message)s'
+    format_string = '[%(asctime)s]\t%(levelname)s\t%(message)s'
 
     # set up the queue for the threaded listener
     que = queue.Queue(-1)  # no limit on size
@@ -55,7 +55,7 @@ def StartLogging():
     ch.setLevel(logging.ERROR)
 
     # create formatter and add it to the console handler
-    formatter = logging.Formatter(FormatString)
+    formatter = logging.Formatter(format_string)
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
 
@@ -120,7 +120,7 @@ class Connection(threading.Thread):
             logging.debug("seems like the last command got a not authed error back trying to reconnect now")
             if self._reAuthenticate():
                 response.req.resp = None
-                response = self.handle(response.req, response.req.callback)
+                self.handle(response.req, response.req.callback)
 
     def handle(self, command, callback):
 
@@ -184,7 +184,7 @@ class Connection(threading.Thread):
         if self._username and self._password:
             logging.info("auto re authenticating !")
             resp = self.auth(self._username, self._password)
-            if resp.rescode not in ('500'):
+            if resp.rescode not in '500':
                 return True
         else:
             return False
@@ -288,7 +288,7 @@ class Connection(threading.Thread):
         if config['DEFAULT']['loggedin'] == 'yes':
             self.link.session = config.get('DEFAULT', 'sessionkey')
             result = self.handle(LogoutCommand(), callback)
-            if (cutConnection):
+            if cutConnection:
                 self.cut()
             config['DEFAULT']['loggedin'] = 'no'
             with open(self.SessionFile, 'w') as configfile:

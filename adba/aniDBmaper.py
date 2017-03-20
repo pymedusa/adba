@@ -57,16 +57,16 @@ class AniDBMaper:
         bit = ''.join(["0" for unused in range(int(len(map) / 4) - len(bit))]) + bit
         return bit
 
-    def _getCodes(self, map, bitChain):
+    def _getCodes(self, map, bit_chain):
         """Returns a list with the corresponding fields as set in the bitChain (hex string)
         """
-        codeList = []
-        bitChain = int(bitChain, 16)
-        mapLength = len(map)
-        for i in reversed(list(range(mapLength))):
-            if bitChain & (2 ** i):
-                codeList.append(map[mapLength - i - 1])
-        return codeList
+        code_list = []
+        bit_chain = int(bit_chain, 16)
+        map_length = len(map)
+        for i in reversed(list(range(map_length))):
+            if bit_chain & (2 ** i):
+                code_list.append(map[map_length - i - 1])
+        return code_list
 
     def getAnimeMapA(self):
         # each line is one byte
@@ -107,16 +107,16 @@ class AniDBMaper:
         print("File A: " + str(self.checkMapFileA(verbos)))
 
     def checkMapFileF(self, verbos=False):
-        getGeneralMap = self.getFileMapF
-        getBits = self.getFileBitsF
-        getCodes = self.getFileCodesF
-        return self._checkMapGeneral(getGeneralMap, getBits, getCodes, verbos=verbos)
+        get_general_map = self.getFileMapF
+        get_bits = self.getFileBitsF
+        get_codes = self.getFileCodesF
+        return self._checkMapGeneral(get_general_map, get_bits, get_codes, verbos=verbos)
 
     def checkMapFileA(self, verbos=False):
-        getGeneralMap = self.getFileMapA
-        getBits = self.getFileBitsA
-        getCodes = self.getFileCodesA
-        return self._checkMapGeneral(getGeneralMap, getBits, getCodes, verbos=verbos)
+        get_general_map = self.getFileMapA
+        get_bits = self.getFileBitsA
+        get_codes = self.getFileCodesA
+        return self._checkMapGeneral(get_general_map, get_bits, get_codes, verbos=verbos)
 
     def _checkMapGeneral(self, getGeneralMap, getBits, getCodes, verbos=False):
         map = getGeneralMap()

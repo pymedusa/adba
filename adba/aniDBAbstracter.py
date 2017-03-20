@@ -41,15 +41,15 @@ class aniDBabstractObject(object):
     def _fill(self, dataline):
         for key in dataline:
             try:
-                tmpList = dataline[key].split("'")
-                if len(tmpList) > 1:
-                    newList = []
-                    for i in tmpList:
+                tmp_list = dataline[key].split("'")
+                if len(tmp_list) > 1:
+                    new_list = []
+                    for i in tmp_list:
                         try:
-                            newList.append(int(i))
+                            new_list.append(int(i))
                         except:
-                            newList.append(str(i, "utf-8"))
-                    self.__dict__[key] = newList
+                            new_list.append(str(i, "utf-8"))
+                    self.__dict__[key] = new_list
                     continue
             except:
                 pass
@@ -93,7 +93,7 @@ class aniDBabstractObject(object):
         priority - low = 0, medium = 1, high = 2 (unconfirmed)
 
         """
-        if (self.aid):
+        if self.aid:
             self.aniDB.notifyadd(aid=self.aid, type=1, priority=1)
 
 
@@ -170,15 +170,15 @@ class Anime(aniDBabstractObject):
         regex = re.compile('( \(\d{4}\))|[%s]' % re.escape(string.punctuation))  # remove any punctuation and e.g. ' (2011)'
         # regex = re.compile('[%s]'  % re.escape(string.punctuation)) # remove any punctuation and e.g. ' (2011)'
         name = regex.sub('', name.lower())
-        lastAid = 0
+        last_aid = 0
         for element in self.allAnimeXML.getiterator():
             if element.get("aid", False):
-                lastAid = int(element.get("aid"))
+                last_aid = int(element.get("aid"))
             if element.text:
                 testname = regex.sub('', element.text.lower())
 
                 if testname == name:
-                    return lastAid
+                    return last_aid
         return 0
 
     # TODO: refactor and use the new functions in anidbFileinfo
@@ -189,9 +189,9 @@ class Anime(aniDBabstractObject):
         for anime in self.allAnimeXML.findall("anime"):
             if int(anime.get("aid", False)) == aid:
                 for title in anime.getiterator():
-                    currentLang = title.get("{http://www.w3.org/XML/1998/namespace}lang", False)
-                    currentType = title.get("type", False)
-                    if (currentLang == "en" and not onlyMain) or currentType == "main":
+                    current_lang = title.get("{http://www.w3.org/XML/1998/namespace}lang", False)
+                    current_type = title.get("type", False)
+                    if (current_lang == "en" and not onlyMain) or current_type == "main":
                         return title.text
         return ""
 
@@ -200,8 +200,8 @@ class Anime(aniDBabstractObject):
             path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
 
         f = open(path, "r")
-        allAnimeXML = etree.ElementTree(file=f)
-        return allAnimeXML
+        all_anime_xml = etree.ElementTree(file=f)
+        return all_anime_xml
 
     def _builPreSequal(self):
         if self.related_aid_list and self.related_aid_type:
@@ -300,12 +300,12 @@ class Episode(aniDBabstractObject):
         if self.filePath and not (self.ed2k or self.size):
             (self.ed2k, self.size) = self._calculate_file_stuff(self.filePath)
         try:
-            EditResponse = self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
+            edit_response = self.aniDB.mylistadd(size=self.size, ed2k=self.ed2k, edit=1, state=state, viewed=viewed, source=source, storage=storage, other=other)
         except Exception as e:
             logging.exception("Exception: %s", e)
         # handling the case that the entry is not in anidb yet, non ideal to check the string but isinstance is having issue
         # currently raises an exception for less changes in the code, unsure if this is the ideal way to do so
-        if (EditResponse.codestr == "NO_SUCH_MYLIST_ENTRY"):
+        if edit_response.codestr == "NO_SUCH_MYLIST_ENTRY":
             logging.info("attempted an edit before add")
             raise AniDBError("Attempted to edit file without adding")
         else:
@@ -323,8 +323,8 @@ class Episode(aniDBabstractObject):
 
     def _calculate_file_stuff(self, filePath):
         if not filePath:
-            return (None, None)
+            return None, None
         logging.info("Calculating the ed2k. Please wait...")
         ed2k = fileInfo.get_ED2K(filePath)
         size = fileInfo.get_file_size(filePath)
-        return (ed2k, size)
+        return ed2k, size
