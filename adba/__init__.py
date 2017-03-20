@@ -15,16 +15,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
-import configparser
 import logging
 import logging.handlers
 import os
-import queue
 import threading
 
 from datetime import timedelta
 from time import time, sleep
 import sys
+
+from six.moves.configparser import ConfigParser
+from six.moves.queue import Queue
 
 from .aniDBlink import AniDBLink
 from .aniDBcommands import *
@@ -39,7 +40,7 @@ def StartLogging():
     format_string = '[%(asctime)s]\t%(levelname)s\t%(message)s'
 
     # set up the queue for the threaded listener
-    que = queue.Queue(-1)  # no limit on size
+    que = Queue(-1)  # no limit on size
     queue_handler = logging.handlers.QueueHandler(que)
 
     # create file handler which logs even debug messages
@@ -240,7 +241,7 @@ class Connection(threading.Thread):
         #             self._iamALIVE = True
         #         else:
         #             logging.info("not starting thread seems like it is already running. this must be a _reAuthenticate")
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         needauth = False
 
@@ -283,7 +284,7 @@ class Connection(threading.Thread):
         Log out from AniDB UDP API
 
         """
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         if config['DEFAULT']['loggedin'] == 'yes':
             self.link.session = config.get('DEFAULT', 'sessionkey')
@@ -302,7 +303,7 @@ class Connection(threading.Thread):
         """
         handles timeout constraints of the link before exiting
         """
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         config['DEFAULT']['lastcommandtime'] = repr(time())
         with open(self.SessionFile, 'w') as configfile:
