@@ -16,11 +16,14 @@
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import socket, sys, zlib
-from time import time, sleep
+import socket
+import sys
 import threading
-from .aniDBresponses import ResponseResolver
+import zlib
+from time import time, sleep
+
 from .aniDBerrors import *
+from .aniDBresponses import ResponseResolver
 
 
 class AniDBLink(threading.Thread):
@@ -34,7 +37,7 @@ class AniDBLink(threading.Thread):
         self.myport = 0
         self.bound = self.connectSocket(myport, self.timeout)
 
-        self.cmd_queue = {None:None}
+        self.cmd_queue = {None: None}
         self.resp_tagged_queue = {}
         self.resp_untagged_queue = []
         self.tags = []
@@ -47,7 +50,7 @@ class AniDBLink(threading.Thread):
         self._stop = threading.Event()
         self._quiting = False
 
-        self.QuitProcessed=False
+        self.QuitProcessed = False
 
         self.setDaemon(True)
         self.start()
@@ -65,20 +68,20 @@ class AniDBLink(threading.Thread):
                 self.myport = port
                 return True
         else:
-            return False;
+            return False
 
     def disconnectSocket(self):
         self.sock.shutdown(socket.SHUT_RD)
         # close is not called as the garbage collection from python will handle this for us.  Calling close can also cause issues with the threaded code.
         # self.sock.close()
 
-    def stop (self):
+    def stop(self):
         logging.info("Releasing socket and stopping link thread")
         self._quiting = True
         self.disconnectSocket()
         self._stop.set()
 
-    def stopped (self):
+    def stopped(self):
         return self._stop.isSet()
 
     def print_log_dummy(self, data):
@@ -121,7 +124,7 @@ class AniDBLink(threading.Thread):
                 if resp.rescode in ('209',):
                     logging.error("sorry encryption is not supported")
                     raise AniDBError()
-                    #self.crypt=aes(md5(resp.req.apipassword+resp.attrs['salt']).digest())
+                    # self.crypt=aes(md5(resp.req.apipassword+resp.attrs['salt']).digest())
                 if resp.rescode in ('203', '403', '500', '501', '503', '506'):
                     self.session = None
                     self.crypt = None
@@ -137,14 +140,18 @@ class AniDBLink(threading.Thread):
                 sys.excepthook(*sys.exc_info())
                 logging.error("Avoiding flood by paranoidly panicing: Aborting link thread, killing connection, releasing waiters and quiting")
                 self.sock.close()
-                try:cmd.waiter.release()
-                except:pass
+                try:
+                    cmd.waiter.release()
+                except:
+                    pass
                 for tag, cmd in self.cmd_queue.items():
-                    try:cmd.waiter.release()
-                    except:pass
+                    try:
+                        cmd.waiter.release()
+                    except:
+                        pass
                 sys.exit()
         if self._quiting:
-            self.QuitProcessed=True
+            self.QuitProcessed = True
 
     def _handle_timeouts(self):
         willpop = []
@@ -201,10 +208,9 @@ class AniDBLink(threading.Thread):
         command.started = time()
         data = command.raw_data()
 
-        self.sock.sendto(bytes(data,"ASCII"), self.target)
+        self.sock.sendto(bytes(data, "ASCII"), self.target)
         if command.command == 'AUTH':
             logging.debug("NetIO > sensitive data is not logged!")
-
 
     def new_tag(self):
         if not len(self.tags):

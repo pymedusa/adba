@@ -15,20 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class AniDBError(Exception):
     pass
+
 
 class AniDBIncorrectParameterError(AniDBError):
     pass
 
+
 class AniDBCommandTimeoutError(AniDBError):
     pass
+
 
 class AniDBMustAuthError(AniDBError):
     pass
 
+
 class AniDBPacketCorruptedError(AniDBError):
     pass
+
 
 class AniDBInternalError(AniDBError):
     pass

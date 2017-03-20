@@ -32,21 +32,22 @@ from .aniDBAbstracter import Anime, Episode
 
 version = 100
 
+
 def StartLogging():
     # set up the format string
-    FormatString='[%(asctime)s]\t%(levelname)s\t%(message)s'
+    FormatString = '[%(asctime)s]\t%(levelname)s\t%(message)s'
 
     # set up the queue for the threaded listener
-    que = queue.Queue(-1) # no limit on size
+    que = queue.Queue(-1)  # no limit on size
     queue_handler = logging.handlers.QueueHandler(que)
 
     # create file handler which logs even debug messages
-    fh = logging.FileHandler('Debug.log',encoding='UTF-8')
+    fh = logging.FileHandler('Debug.log', encoding='UTF-8')
     # fh = logging.StreamHandler()
     fh.setLevel(logging.DEBUG)
 
     # set up the listener for the file handler
-    listener= logging.handlers.QueueListener(que,fh)
+    listener = logging.handlers.QueueListener(que, fh)
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()
@@ -58,12 +59,13 @@ def StartLogging():
     fh.setFormatter(formatter)
 
     # initialize the basic logger with the handlers
-    logging.basicConfig(handlers=[queue_handler,ch], level=logging.DEBUG)
+    logging.basicConfig(handlers=[queue_handler, ch], level=logging.DEBUG)
 
     # start listener for logging
     listener.start()
     # logging.debug('starting up')
     return listener
+
 
 def StopLogging(listener):
     # listener.start()
@@ -71,8 +73,9 @@ def StopLogging(listener):
     logging.shutdown()
     return
 
+
 class Connection(threading.Thread):
-    def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, keepAlive=False,commandDelay=4.1):
+    def __init__(self, clientname='adba', server='api.anidb.info', port=9000, myport=9876, user=None, password=None, session=None, keepAlive=False, commandDelay=4.1):
         super(Connection, self).__init__()
 
         self.link = AniDBLink(server, port, myport, delay=commandDelay)
@@ -81,16 +84,16 @@ class Connection(threading.Thread):
         self.clientver = version
 
         # from original lib
-        self.mode = 1    #mode: 0=queue,1=unlock,2=callback
+        self.mode = 1  # mode: 0=queue,1=unlock,2=callback
 
-        #Filename to maintain session info always in script directory
-        self.SessionFile=os.path.normpath(sys.path[0] + os.sep + "Session.cfg")
+        # Filename to maintain session info always in script directory
+        self.SessionFile = os.path.normpath(sys.path[0] + os.sep + "Session.cfg")
 
         # to lock other threads out
         self.lock = threading.RLock()
 
-        #last Command Time set to now even though no commands are sent yet
-        self.LastCommandTime=time()
+        # last Command Time set to now even though no commands are sent yet
+        self.LastCommandTime = time()
 
         # thread keep alive stuff
         self.keepAlive = keepAlive
@@ -108,7 +111,6 @@ class Connection(threading.Thread):
     def stop(self):
         self.logout(cutConnection=True)
 
-
     def cut(self):
         self.link.stop()
 
@@ -119,23 +121,22 @@ class Connection(threading.Thread):
                 response.req.resp = None
                 response = self.handle(response.req, response.req.callback)
 
-
     def handle(self, command, callback):
 
         self.lock.acquire()
 
-        #the lines changing the timing of requests is being disabled due to impracticality of implementation
-        #once full session manager i.e. (one that works beyond a single run of the program)
-        #similiar code will handle this
+        # the lines changing the timing of requests is being disabled due to impracticality of implementation
+        # once full session manager i.e. (one that works beyond a single run of the program)
+        # similiar code will handle this
 
-        if self.counterAge < (time() - 120): # the last request was older then 2 min reset delay and counter
+        if self.counterAge < (time() - 120):  # the last request was older then 2 min reset delay and counter
             self.counter = 0
             # self.link.delay = 2
-        # else: # something happend in the last 120 seconds
+            # else: # something happend in the last 120 seconds
             # if self.counter < 5:
-                # self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
+            # self.link.delay = 2 # short term "A Client MUST NOT send more than 0.5 packets per second (that's one packet every two seconds, not two packets a second!)"
             # elif self.counter >= 5:
-                # self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
+            # self.link.delay = 6 # long term "A Client MUST NOT send more than one packet every four seconds over an extended amount of time."
 
         if command.command not in ('AUTH', 'PING', 'ENCRYPT'):
             self.counterAge = time()
@@ -150,11 +151,11 @@ class Connection(threading.Thread):
 
         logging.debug("handling(" + str(self.counter) + "-" + str(self.link.delay) + ") command " + str(command.command))
 
-        #make live request
+        # make live request
         command.authorize(self.mode, self.link.new_tag(), self.link.session, callback_wrapper)
         self.link.request(command)
 
-        #handle mode 1 (wait for response)
+        # handle mode 1 (wait for response)
         if self.mode == 1:
             command.wait_response()
             try:
@@ -194,11 +195,11 @@ class Connection(threading.Thread):
         # if not reauthenticate
         if self.lastAuth and time() - self.lastAuth > 1800:
             logging.info("auto uptime !")
-            self.uptime() # this will update the self.link.session and will refresh the session if it is still alive
+            self.uptime()  # this will update the self.link.session and will refresh the session if it is still alive
 
-            if self.authed(): # if we are authed we set the time
+            if self.authed():  # if we are authed we set the time
                 self.lastAuth = time()
-            else: # if we aren't authed and we have the user and pw then reauthenticate
+            else:  # if we aren't authed and we have the user and pw then reauthenticate
                 self._reAuthenticate()
 
         # issue a ping every 20 minutes after the last package
@@ -207,12 +208,10 @@ class Connection(threading.Thread):
             logging.info("auto ping !")
             self.ping()
 
-
     def run(self):
         while self.keepAlive:
             self._keep_alive()
             sleep(120)
-
 
     def auth(self, username, password, nat=None, mtu=None, callback=None):
         """
@@ -226,7 +225,7 @@ class Connection(threading.Thread):
 
         """
 
-        #disabled, this code doesn't work with renovations
+        # disabled, this code doesn't work with renovations
         # logging.debug("ok1")
         # if self.keepAlive:
         #     logging.debug("ok2")
@@ -257,7 +256,7 @@ class Connection(threading.Thread):
             else:
                 needauth = True
         except:
-                needauth = True
+            needauth = True
 
         if needauth:
             self.lastAuth = time()
@@ -267,13 +266,13 @@ class Connection(threading.Thread):
             except Exception as e:
                 logging.debug('Auth command with exception %s', e)
                 # we force a config file with logged out to ensure a known state if an exception occurs, forcing us to log in again
-                config['DEFAULT'] = {'loggedin': 'yes', 'sessionkey': self.link.session, 'exception':str(e),
+                config['DEFAULT'] = {'loggedin': 'yes', 'sessionkey': self.link.session, 'exception': str(e),
                                      'lastcommandtime': repr(time())}
                 with open(self.SessionFile, 'w') as configfile:
                     config.write(configfile)
                 return e
             logging.debug('Successfully authenticated and recording session details')
-            config['DEFAULT'] ={'loggedin': 'yes', 'sessionkey': self.link.session, 'lastcommandtime': repr(time())}
+            config['DEFAULT'] = {'loggedin': 'yes', 'sessionkey': self.link.session, 'lastcommandtime': repr(time())}
             with open(self.SessionFile, 'w') as configfile:
                 config.write(configfile)
         return
@@ -288,7 +287,7 @@ class Connection(threading.Thread):
         if config['DEFAULT']['loggedin'] == 'yes':
             self.link.session = config.get('DEFAULT', 'sessionkey')
             result = self.handle(LogoutCommand(), callback)
-            if(cutConnection):
+            if (cutConnection):
                 self.cut()
             config['DEFAULT']['loggedin'] = 'no'
             with open(self.SessionFile, 'w') as configfile:
@@ -355,7 +354,6 @@ class Connection(threading.Thread):
         """
 
         return self.handle(NotifyAddCommand(aid, gid, type, priority), callback)
-
 
     def notify(self, buddy=None, callback=None):
         """
@@ -484,7 +482,7 @@ class Connection(threading.Thread):
         """
         return self.handle(BuddyStateCommand(startat), callback)
 
-    def anime(self, aid=None, aname=None, amask= -1, callback=None):
+    def anime(self, aid=None, aname=None, amask=-1, callback=None):
         """
         Get information about an anime
 
@@ -518,7 +516,7 @@ class Connection(threading.Thread):
         """
         return self.handle(EpisodeCommand(eid, aid, aname, epno), callback)
 
-    def file(self, fid=None, size=None, ed2k=None, aid=None, aname=None, gid=None, gname=None, epno=None, fmask= -1, amask=0, callback=None):
+    def file(self, fid=None, size=None, ed2k=None, aid=None, aname=None, gid=None, gname=None, epno=None, fmask=-1, amask=0, callback=None):
         """
         Get information about a file
 

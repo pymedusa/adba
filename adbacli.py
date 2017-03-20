@@ -15,39 +15,39 @@ fileTypes = '.avi,.mp4,.mkv,.ogm'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('command', choices=['hash', 'mylistadd', 'mylistdel', 'mylistaddwithfields', 'getfields', 'listfields', 'logout'],
-help='Command to execute. hash: Hash the file and print its ed2k hash. mylistadd: Hash the file and add it to AniDB MyList. If the file was there, it will be updated. mylistdel: Hash the file and delete it from AniDB MyList. getfields: Hash the file and retrieve requested fields for the hashed file. listfields: Lists all the available fields that can be requested from AniDB.')
+                    help='Command to execute. hash: Hash the file and print its ed2k hash. mylistadd: Hash the file and add it to AniDB MyList. If the file was there, it will be updated. mylistdel: Hash the file and delete it from AniDB MyList. getfields: Hash the file and retrieve requested fields for the hashed file. listfields: Lists all the available fields that can be requested from AniDB.')
 parser.add_argument('--file-types', default=fileTypes,
-help='A comma delmited list of file types to be included when searching directories. Default: ' + fileTypes)
+                    help='A comma delmited list of file types to be included when searching directories. Default: ' + fileTypes)
 parser.add_argument('--out-file', action='store', default=None,
-help='Write output to specified file instead of STDOUT.')
+                    help='Write output to specified file instead of STDOUT.')
 parser.add_argument('-u', '--username', action='store', default=None,
-help='User name needed to communicate with AniDB.')
+                    help='User name needed to communicate with AniDB.')
 parser.add_argument('-p', '--password', action='store', default=None,
-help='Password needed to communicate with AniDB.')
+                    help='Password needed to communicate with AniDB.')
 parser.add_argument('--state', choices=['unknown', 'hdd', 'cd', 'deleted'], default='hdd',
-help='Sets the file state to unknown/hdd/cd/deleted. Default: hdd')
+                    help='Sets the file state to unknown/hdd/cd/deleted. Default: hdd')
 parser.add_argument('--watched', action='store_true',
-help='Marks the file as watched.')
+                    help='Marks the file as watched.')
 parser.add_argument('--unwatched', action='store_true',
-help='Marks the file as unwatched.')
+                    help='Marks the file as unwatched.')
 parser.add_argument('--source', action='store', default=None,
-help='Sets the file source (any string).')
+                    help='Sets the file source (any string).')
 parser.add_argument('--storage', action='store', default=None,
-help='Sets file storage (any string).')
+                    help='Sets file storage (any string).')
 parser.add_argument('--other', action='store', default=None,
-help='Sets other remarks (any string).')
+                    help='Sets other remarks (any string).')
 parser.add_argument('--fields', action='store', default=None,
-help='A comma delimited list of fields requested from AniDB.')
+                    help='A comma delimited list of fields requested from AniDB.')
 parser.add_argument('--fast-command-delay', action='store_true',
-help='Specify the command delay to wait for 2.1 seconds as opposed to the default of 4.1 seconds.')
+                    help='Specify the command delay to wait for 2.1 seconds as opposed to the default of 4.1 seconds.')
 parser.add_argument('files', nargs='*', default=[],
-help='All files and/or folders to be processed.')
+                    help='All files and/or folders to be processed.')
 
 args, otherArgs = parser.parse_known_args()
 
 fileParser = argparse.ArgumentParser()
 fileParser.add_argument('files', nargs='*', default=[],
-help='All files and/or folders to be processed.')
+                        help='All files and/or folders to be processed.')
 
 fileArgs = fileParser.parse_args(otherArgs)
 
@@ -219,7 +219,7 @@ elif args.command == 'listfields':
 connection.stayloggedin()
 
 if args.out_file:
-        sys.stdout.close()
+    sys.stdout.close()
 
 adba.StopLogging(FileListener)
 

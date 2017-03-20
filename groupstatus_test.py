@@ -35,7 +35,7 @@ connection = adba.Connection()
 # we can always ping to see if we can reach the server
 try:
     connection.ping()
-except Exception as e :
+except Exception as e:
     print(("exception msg: " + str(e)))
     print("if we cant even ping stop right here")
     exit()
@@ -44,11 +44,10 @@ except Exception as e :
 try:
     connection.auth(user, pw)
     pass
-except Exception as e :
+except Exception as e:
     print(("exception msg: " + str(e)))
 
 animeList = ["Bleach", "Naruto Shippuuden", "Blue Exorcist"]
-
 
 for animeName in animeList:
     print(("########################### " + animeName + " ###########################"))
