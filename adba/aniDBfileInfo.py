@@ -115,5 +115,5 @@ def read_xml_into_etree(filePath):
         return None
 
     f = open(filePath, "r")
-    xmlASetree = etree.ElementTree(file=f)
-    return xmlASetree
+    xml_a_setree = etree.ElementTree(file=f)
+    return xml_a_setree
