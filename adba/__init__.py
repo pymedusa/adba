@@ -120,7 +120,7 @@ class Connection(threading.Thread):
             logging.debug("seems like the last command got a not authed error back trying to reconnect now")
             if self._reAuthenticate():
                 response.req.resp = None
-                response = self.handle(response.req, response.req.callback)
+                self.handle(response.req, response.req.callback)
 
     def handle(self, command, callback):
 
