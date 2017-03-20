@@ -36,7 +36,7 @@ version = 100
 
 def StartLogging():
     # set up the format string
-    FormatString = '[%(asctime)s]\t%(levelname)s\t%(message)s'
+    format_string = '[%(asctime)s]\t%(levelname)s\t%(message)s'
 
     # set up the queue for the threaded listener
     que = queue.Queue(-1)  # no limit on size
@@ -55,7 +55,7 @@ def StartLogging():
     ch.setLevel(logging.ERROR)
 
     # create formatter and add it to the console handler
-    formatter = logging.Formatter(FormatString)
+    formatter = logging.Formatter(format_string)
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
 
