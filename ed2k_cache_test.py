@@ -45,22 +45,22 @@ fileCount=0
 filesToHash=400
 ED2KCache={}
 for dirPath, dirNames, fileNames in os.walk(testRootDir):
-	for fileName in fileNames:
-		currentFilePath=os.path.normpath(dirPath + os.sep + fileName)
-		eD2KHash=get_ED2K(currentFilePath)
-		print(currentFilePath,eD2KHash)
-		ED2KCache[fileName]=(eD2KHash)
-		fileCount+=1
-		if(fileCount>filesToHash):
-			break
-	if(fileCount>filesToHash):
-		break
+    for fileName in fileNames:
+        currentFilePath=os.path.normpath(dirPath + os.sep + fileName)
+        eD2KHash=get_ED2K(currentFilePath)
+        print(currentFilePath,eD2KHash)
+        ED2KCache[fileName]=(eD2KHash)
+        fileCount+=1
+        if(fileCount>filesToHash):
+            break
+    if(fileCount>filesToHash):
+        break
 
 
 
 
 for key in ED2KCache:
-	print(key,ED2KCache[key])
+    print(key,ED2KCache[key])
 
 print(len(ED2KCache))
 
