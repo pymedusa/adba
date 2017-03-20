@@ -22,8 +22,7 @@ import queue
 import threading
 
 from datetime import timedelta
-from time import time, sleep, strftime, localtime
-from types import *
+from time import time, sleep
 import sys
 
 from .aniDBlink import AniDBLink
