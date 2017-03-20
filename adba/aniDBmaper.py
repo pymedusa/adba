@@ -106,15 +106,15 @@ class AniDBMaper:
         print("File A: " + str(self.checkMapFileA(verbos)))
 
     def checkMapFileF(self, verbos=False):
-        getGeneralMap = lambda: self.getFileMapF()
-        getBits = lambda x: self.getFileBitsF(x)
-        getCodes = lambda x: self.getFileCodesF(x)
+        getGeneralMap = self.getFileMapF
+        getBits = self.getFileBitsF
+        getCodes = self.getFileCodesF
         return self._checkMapGeneral(getGeneralMap, getBits, getCodes, verbos=verbos)
 
     def checkMapFileA(self, verbos=False):
-        getGeneralMap = lambda: self.getFileMapA()
-        getBits = lambda x: self.getFileBitsA(x)
-        getCodes = lambda x: self.getFileCodesA(x)
+        getGeneralMap = self.getFileMapA
+        getBits = self.getFileBitsA
+        getCodes = self.getFileCodesA
         return self._checkMapGeneral(getGeneralMap, getBits, getCodes, verbos=verbos)
 
     def _checkMapGeneral(self, getGeneralMap, getBits, getCodes, verbos=False):
