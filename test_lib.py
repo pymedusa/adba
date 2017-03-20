@@ -47,4 +47,5 @@ def log_function(data, logLvl="INFO"):
     print((getNowString() + "-" + str(logLvl) + ": " + str(data)))
 
 
-logwrapper = lambda x: log_function("anidb: " + str(x), "DEBUG")
+def logwrapper(x):
+    log_function("anidb: " + str(x), "DEBUG")
