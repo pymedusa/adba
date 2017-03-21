@@ -64,7 +64,8 @@ class Command:
             tmp.append("%s=%s" % (self.escape(key), self.escape(value)))
         return ' '.join([command, '&'.join(tmp)])
 
-    def escape(self, data):
+    @staticmethod
+    def escape(data):
         return str(data).replace('&', '&amp;')
 
     def raw_data(self):

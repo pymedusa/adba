@@ -75,7 +75,8 @@ class aniDBabstractObject(object):
 
         self.allNames = names
 
-    def _easy_extend(self, initialList, item):
+    @staticmethod
+    def _easy_extend(initialList, item):
         if item:
             if isinstance(item, list):
                 initialList.extend(item)
@@ -171,7 +172,7 @@ class Anime(aniDBabstractObject):
         # regex = re.compile('[%s]'  % re.escape(string.punctuation)) # remove any punctuation and e.g. ' (2011)'
         name = regex.sub('', name.lower())
         last_aid = 0
-        for element in self.allAnimeXML.getiterator():
+        for element in self.allAnimeXML.iter():
             if element.get("aid", False):
                 last_aid = int(element.get("aid"))
             if element.text:
@@ -195,7 +196,8 @@ class Anime(aniDBabstractObject):
                         return title.text
         return ""
 
-    def _read_animetitels_xml(self, path=None):
+    @staticmethod
+    def _read_animetitels_xml(path=None):
         if not path:
             path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
 
@@ -220,7 +222,7 @@ class Anime(aniDBabstractObject):
 
 class Episode(aniDBabstractObject):
     def __init__(self, aniDB, number=None, epid=None, filePath=None, fid=None, epno=None, paramsA=None, paramsF=None, load=False, calculate=False):
-        if not aniDB and not number and not epid and not file and not fid:
+        if not aniDB and not number and not epid and not filePath and not fid:
             return None
 
         self.maper = AniDBMaper()
@@ -321,7 +323,8 @@ class Episode(aniDBabstractObject):
         else:
             logging.info("Deleted the episode from anidb")
 
-    def _calculate_file_stuff(self, filePath):
+    @staticmethod
+    def _calculate_file_stuff(filePath):
         if not filePath:
             return None, None
         logging.info("Calculating the ed2k. Please wait...")
