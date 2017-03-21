@@ -51,7 +51,7 @@ class AniDBMaper:
         bit = 0
         for index, field in enumerate(map):
             if field in wanted and field not in self.blacklist:
-                bit = bit ^ (1 << len(map) - index - 1)
+                bit ^= 1 << len(map) - index - 1
 
         bit = str(hex(bit)).lstrip("0x").rstrip("L")
         bit = ''.join(["0" for unused in range(int(len(map) / 4) - len(bit))]) + bit
