@@ -75,7 +75,8 @@ class aniDBabstractObject(object):
 
         self.allNames = names
 
-    def _easy_extend(self, initialList, item):
+    @staticmethod
+    def _easy_extend(initialList, item):
         if item:
             if isinstance(item, list):
                 initialList.extend(item)
@@ -195,7 +196,8 @@ class Anime(aniDBabstractObject):
                         return title.text
         return ""
 
-    def _read_animetitels_xml(self, path=None):
+    @staticmethod
+    def _read_animetitels_xml(path=None):
         if not path:
             path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
 
@@ -321,7 +323,8 @@ class Episode(aniDBabstractObject):
         else:
             logging.info("Deleted the episode from anidb")
 
-    def _calculate_file_stuff(self, filePath):
+    @staticmethod
+    def _calculate_file_stuff(filePath):
         if not filePath:
             return None, None
         logging.info("Calculating the ed2k. Please wait...")

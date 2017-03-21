@@ -29,7 +29,8 @@ class ResponseResolver:
         self.resstr = resstr
         self.datalines = datalines
 
-    def parse(self, data):
+    @staticmethod
+    def parse(data):
         resline = data.split('\n', 1)[0]
         lines = data.split('\n')[1:-1]
 

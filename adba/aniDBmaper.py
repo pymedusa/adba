@@ -57,7 +57,8 @@ class AniDBMaper:
         bit = ''.join(["0" for unused in range(int(len(map) / 4) - len(bit))]) + bit
         return bit
 
-    def _getCodes(self, map, bit_chain):
+    @staticmethod
+    def _getCodes(map, bit_chain):
         """Returns a list with the corresponding fields as set in the bitChain (hex string)
         """
         code_list = []
@@ -68,7 +69,8 @@ class AniDBMaper:
                 code_list.append(map[map_length - i - 1])
         return code_list
 
-    def getAnimeMapA(self):
+    @staticmethod
+    def getAnimeMapA():
         # each line is one byte
         # only chnage this if the api changes
         map = ['aid', 'unused', 'year', 'type', 'related_aid_list', 'related_aid_type', 'category_list', 'category_weight_list',
@@ -80,7 +82,8 @@ class AniDBMaper:
                'specials_count', 'credits_count', 'other_count', 'trailer_count', 'parody_count', 'unused', 'unused', 'unused']
         return map
 
-    def getFileMapF(self):
+    @staticmethod
+    def getFileMapF():
         # each line is one byte
         # only chnage this if the api changes
         map = ['unused', 'aid', 'eid', 'gid', 'mylist_id', 'list_other_episodes', 'IsDeprecated', 'state',
@@ -90,7 +93,8 @@ class AniDBMaper:
                'mylist_state', 'mylist_filestate', 'mylist_viewed', 'mylist_viewdate', 'mylist_storage', 'mylist_source', 'mylist_other', 'unused']
         return map
 
-    def getFileMapA(self):
+    @staticmethod
+    def getFileMapA():
         # each line is one byte
         # only chnage this if the api changes
         map = ['anime_total_episodes', 'highest_episode_number', 'year', 'type', 'related_aid_list', 'related_aid_type', 'category_list', 'reserved',
