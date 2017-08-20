@@ -122,6 +122,10 @@ if args.command == 'hash':
 	for thisFile in fileList:
 		thisED2K = adba.aniDBfileInfo.get_ED2K(thisFile, forceHash=True)
 		print(thisED2K)
+	if args.out_file:
+		sys.stdout.close()
+	adba.StopLogging(FileListener)
+	sys.exit(0)
 elif args.command == 'mylistadd':
 	# First try to add the file, then try to edit
 	if connection.authed():
