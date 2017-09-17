@@ -23,7 +23,6 @@ import pickle
 import os
 import sys
 import xml.etree.cElementTree as etree
-from functools import reduce
 
 
 # http://www.radicand.org/blog/orz/2010/2/21/edonkey2000-hash-in-python/
@@ -61,7 +60,7 @@ def get_ED2K(filePath, forceHash=False, cacheLocation=os.path.normpath(sys.path[
                 with open(cacheLocation, 'wb') as f:
                     pickle.dump(get_ED2K.ED2KCache, f, pickle.HIGHEST_PROTOCOL)
         except:
-            logging.error("Error occured while writing back to disk")
+            logging.error("Error occurred while writing back to disk")
         return
 
     file_modified_time = os.path.getmtime(filePath)

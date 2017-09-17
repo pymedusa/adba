@@ -15,10 +15,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 import os
 import getopt
-from time import time, sleep, strftime, localtime
+from time import time, strftime, localtime
 
 opts, extraparams = getopt.getopt(sys.argv[1:], 'u:p:f:')
 user = ""
