@@ -23,7 +23,6 @@ import pickle
 import os
 import sys
 import xml.etree.cElementTree as etree
-from functools import reduce
 
 
 # http://www.radicand.org/blog/orz/2010/2/21/edonkey2000-hash-in-python/

@@ -2,12 +2,10 @@
 # coding=utf-8
 
 import argparse
-import inspect
 import logging
 import os
 import sys
 import adba
-import pprint
 
 stateToUDP = dict(unknown=0, hdd=1, cd=2, deleted=3)
 viewedToUDP = dict(unwatched=0, watched=1)
