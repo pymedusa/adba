@@ -99,7 +99,7 @@ class aniDBabstractObject(object):
 
 
 class Anime(aniDBabstractObject):
-    def __init__(self, aniDB, name=None, aid=None, tvdbid=None, paramsA=None, autoCorrectName=False, load=False):
+    def __init__(self, aniDB, name=None, aid=None, tvdbid=None, paramsA=None, autoCorrectName=False, load=False, cache_path=None):
 
         self.maper = AniDBMaper()
         self.tvDBMap = TvDBMap()
@@ -108,6 +108,7 @@ class Anime(aniDBabstractObject):
         self.name = name
         self.aid = aid
         self.tvdb_id = tvdbid
+        self.cache_path = cache_path
 
         if self.tvdb_id and not self.aid:
             self.aid = self.tvDBMap.get_anidb_for_tvdb(self.tvdb_id)
@@ -116,7 +117,7 @@ class Anime(aniDBabstractObject):
             raise AniDBIncorrectParameterError("No aid or name available")
 
         if not self.aid:
-            self.aid = self._get_aid_from_xml(self.name)
+            self.aid = self._get_aid_from_xml(self.name, path=self.cache_path)
         # if not self.name or autoCorrectName:
         #    self.name = self._get_name_from_xml(self.aid)
 
@@ -196,9 +197,8 @@ class Anime(aniDBabstractObject):
                         return title.text
         return ""
 
-    @staticmethod
-    def _read_animetitels_xml(path=None):
-        if not path:
+    def _read_animetitels_xml(self):
+        if not self.path:
             path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
 
         f = open(path, "r")
