@@ -17,15 +17,15 @@
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 import re
+from six import string_types
 import string
-import xml.etree.cElementTree as etree
 
 from . import aniDBfileInfo as fileInfo
 from .aniDBerrors import *
 from .aniDBmaper import AniDBMaper
 from .aniDBtvDBmaper import TvDBMap
+from .aniDBfileInfo import read_anidb_xml
 
 
 class aniDBabstractObject(object):
@@ -48,7 +48,7 @@ class aniDBabstractObject(object):
                         try:
                             new_list.append(int(i))
                         except:
-                            new_list.append(str(i, "utf-8"))
+                            new_list.append(i)
                     self.__dict__[key] = new_list
                     continue
             except:
@@ -56,7 +56,7 @@ class aniDBabstractObject(object):
             try:
                 self.__dict__[key] = int(dataline[key])
             except:
-                # self.__dict__[key] = str(dataline[key], "utf-8")
+                # self.__dict__[key] = text_type(dataline[key], "utf-8")
                 self.__dict__[key] = dataline[key]
             key = property(lambda x: dataline[key])
 
@@ -80,7 +80,7 @@ class aniDBabstractObject(object):
         if item:
             if isinstance(item, list):
                 initialList.extend(item)
-            elif isinstance(item, str):
+            elif isinstance(item, string_types):
                 initialList.append(item)
 
         return initialList
@@ -102,7 +102,7 @@ class Anime(aniDBabstractObject):
     def __init__(self, aniDB, name=None, aid=None, tvdbid=None, paramsA=None, autoCorrectName=False, load=False, cache_path=None):
 
         self.maper = AniDBMaper()
-        self.tvDBMap = TvDBMap()
+        self.tvDBMap = TvDBMap(cache_path)
         self.allAnimeXML = None
 
         self.name = name
@@ -117,7 +117,7 @@ class Anime(aniDBabstractObject):
             raise AniDBIncorrectParameterError("No aid or name available")
 
         if not self.aid:
-            self.aid = self._get_aid_from_xml(self.name, path=self.cache_path)
+            self.aid = self._get_aid_from_xml(self.name)
         # if not self.name or autoCorrectName:
         #    self.name = self._get_name_from_xml(self.aid)
 
@@ -158,7 +158,7 @@ class Anime(aniDBabstractObject):
         self.rawData = self.aniDB.groupstatus(aid=self.aid)
         self.release_groups = []
         for line in self.rawData.datalines:
-            self.release_groups.append({"name": str(line["name"], "utf-8"),
+            self.release_groups.append({"name": line["name"],
                                         "rating": line["rating"],
                                         "range": line["episode_range"]
                                         })
@@ -198,11 +198,7 @@ class Anime(aniDBabstractObject):
         return ""
 
     def _read_animetitels_xml(self):
-        if not self.path:
-            path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
-
-        f = open(path, "r")
-        all_anime_xml = etree.ElementTree(file=f)
+        all_anime_xml = read_anidb_xml(self.cache_path)
         return all_anime_xml
 
     def _builPreSequal(self):

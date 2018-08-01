@@ -21,6 +21,7 @@ import socket
 import sys
 import threading
 import zlib
+from builtins import bytes
 from time import time, sleep
 
 from .aniDBerrors import *

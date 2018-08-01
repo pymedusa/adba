@@ -21,7 +21,9 @@ import hashlib
 import logging
 import pickle
 import os
+import requests
 import sys
+import time
 import xml.etree.cElementTree as etree
 
 
@@ -97,15 +99,20 @@ def get_file_size(path):
     return size
 
 
-def read_anidb_xml(file_path):
-    if not file_path:
+def read_anidb_xml(file_path=None):
+    if not os.path.join(file_path, "animetitles.xml"):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
+    elif not file_path.endswith("xml"):
+        file_path = os.path.join(file_path, "animetitles.xml")
     return read_xml_into_etree(file_path)
 
 
-def read_tvdb_map_xml(file_path):
+def read_tvdb_map_xml(file_path=None):
     if not file_path:
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "anime-list.xml")
+    elif not file_path.endswith(".xml"):
+        file_path = os.path.join(file_path, "anime-list.xml")
+
     return read_xml_into_etree(file_path)
 
 
@@ -113,6 +120,49 @@ def read_xml_into_etree(filePath):
     if not filePath:
         return None
 
+    if not os.path.isfile(filePath):
+        if not get_anime_titles_xml(filePath):
+            return
+    else:
+        mtime = os.path.getmtime(filePath)
+        if time.time() > mtime + 24 * 60 * 60:
+            if not get_anime_titles_xml(filePath):
+                return
+
     f = open(filePath, "r")
     xml_a_setree = etree.ElementTree(file=f)
     return xml_a_setree
+
+
+def _remove_file_failed(file):
+    try:
+        os.remove(file)
+    except:
+        pass
+
+
+def download_file(url, filename):
+    try:
+        r = requests.get(url, stream=True, verify=False)
+        r.raise_for_status()
+        with open(filename, 'wb') as fp:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    fp.write(chunk)
+                    fp.flush()
+
+    except (requests.HTTPError, requests.exceptions.RequestException):
+        _remove_file_failed(filename)
+        return False
+    except (requests.ConnectionError, requests.Timeout):
+        return False
+
+    return True
+
+
+def get_anime_titles_xml(path):
+    return download_file("https://raw.githubusercontent.com/ScudLee/anime-lists/master/animetitles.xml", path)
+
+
+def get_anime_list_xml(path):
+    return download_file("https://raw.githubusercontent.com/ScudLee/anime-lists/master/anime-list.xml", path)
