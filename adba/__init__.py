@@ -24,8 +24,7 @@ from datetime import timedelta
 from time import time, sleep
 import sys
 
-from six import iteritems
-from six.moves.configparser import ConfigParser
+from configparser import ConfigParser
 from six.moves.queue import Queue
 
 from .aniDBlink import AniDBLink
@@ -75,21 +74,6 @@ def StopLogging(listener):
     listener.stop()
     logging.shutdown()
     return
-
-
-class Py23ConfigParser(ConfigParser, object):
-    """A ConfigParser subclass for monkeypatching python2/3 support."""
-    def __init__(self):
-        super(Py23ConfigParser, self).__init__()
-
-    def __setitem__(self, section, values):
-        """
-        In py3 you can use the ConfigParser object as a dict. For example: parser_obj[secion] = {dict with key/values}.
-        This hack will allow you to use the same with python2.
-        Be aware this is a very naive solution, and should not but used outside of this application.
-        """
-        for k, v in iteritems(values):
-            self.set(section, k, v)
 
 
 class Connection(threading.Thread):
@@ -257,7 +241,7 @@ class Connection(threading.Thread):
         #             self._iamALIVE = True
         #         else:
         #             logging.info("not starting thread seems like it is already running. this must be a _reAuthenticate")
-        config = Py23ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         needauth = False
 
@@ -300,7 +284,7 @@ class Connection(threading.Thread):
         Log out from AniDB UDP API
 
         """
-        config = Py23ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         if config['DEFAULT']['loggedin'] == 'yes':
             self.link.session = config.get('DEFAULT', 'sessionkey')
@@ -319,7 +303,7 @@ class Connection(threading.Thread):
         """
         handles timeout constraints of the link before exiting
         """
-        config = Py23ConfigParser()
+        config = ConfigParser()
         config.read(self.SessionFile)
         config['DEFAULT']['lastcommandtime'] = repr(time())
         with open(self.SessionFile, 'w') as configfile:
