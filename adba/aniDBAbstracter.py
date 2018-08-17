@@ -19,13 +19,14 @@
 import logging
 import os
 import re
+from six import string_types
 import string
-import xml.etree.cElementTree as etree
 
 from . import aniDBfileInfo as fileInfo
 from .aniDBerrors import *
 from .aniDBmaper import AniDBMaper
 from .aniDBtvDBmaper import TvDBMap
+from .aniDBfileInfo import read_anidb_xml
 
 
 class aniDBabstractObject(object):
@@ -48,7 +49,7 @@ class aniDBabstractObject(object):
                         try:
                             new_list.append(int(i))
                         except:
-                            new_list.append(str(i, "utf-8"))
+                            new_list.append(i)
                     self.__dict__[key] = new_list
                     continue
             except:
@@ -56,7 +57,7 @@ class aniDBabstractObject(object):
             try:
                 self.__dict__[key] = int(dataline[key])
             except:
-                # self.__dict__[key] = str(dataline[key], "utf-8")
+                # self.__dict__[key] = text_type(dataline[key], "utf-8")
                 self.__dict__[key] = dataline[key]
             key = property(lambda x: dataline[key])
 
@@ -80,7 +81,7 @@ class aniDBabstractObject(object):
         if item:
             if isinstance(item, list):
                 initialList.extend(item)
-            elif isinstance(item, str):
+            elif isinstance(item, string_types):
                 initialList.append(item)
 
         return initialList
@@ -99,15 +100,20 @@ class aniDBabstractObject(object):
 
 
 class Anime(aniDBabstractObject):
-    def __init__(self, aniDB, name=None, aid=None, tvdbid=None, paramsA=None, autoCorrectName=False, load=False):
+    def __init__(self, aniDB, name=None, aid=None, tvdbid=None, paramsA=None, autoCorrectName=False, load=False, cache_path=None):
 
         self.maper = AniDBMaper()
-        self.tvDBMap = TvDBMap()
+
+        if cache_path and not os.path.exists(cache_path):
+            os.makedirs(cache_path)
+
+        self.tvDBMap = TvDBMap(cache_path)
         self.allAnimeXML = None
 
         self.name = name
         self.aid = aid
         self.tvdb_id = tvdbid
+        self.cache_path = cache_path
 
         if self.tvdb_id and not self.aid:
             self.aid = self.tvDBMap.get_anidb_for_tvdb(self.tvdb_id)
@@ -157,7 +163,7 @@ class Anime(aniDBabstractObject):
         self.rawData = self.aniDB.groupstatus(aid=self.aid)
         self.release_groups = []
         for line in self.rawData.datalines:
-            self.release_groups.append({"name": str(line["name"], "utf-8"),
+            self.release_groups.append({"name": line["name"],
                                         "rating": line["rating"],
                                         "range": line["episode_range"]
                                         })
@@ -166,7 +172,7 @@ class Anime(aniDBabstractObject):
     # TODO: refactor and use the new functions in anidbFileinfo
     def _get_aid_from_xml(self, name):
         if not self.allAnimeXML:
-            self.allAnimeXML = self._read_animetitels_xml()
+            self.allAnimeXML = read_anidb_xml(self.cache_path)
 
         regex = re.compile('( \(\d{4}\))|[%s]' % re.escape(string.punctuation))  # remove any punctuation and e.g. ' (2011)'
         # regex = re.compile('[%s]'  % re.escape(string.punctuation)) # remove any punctuation and e.g. ' (2011)'
@@ -185,7 +191,7 @@ class Anime(aniDBabstractObject):
     # TODO: refactor and use the new functions in anidbFileinfo
     def _get_name_from_xml(self, aid, onlyMain=True):
         if not self.allAnimeXML:
-            self.allAnimeXML = self._read_animetitels_xml()
+            self.allAnimeXML = read_anidb_xml(self.cache_path)
 
         for anime in self.allAnimeXML.findall("anime"):
             if int(anime.get("aid", False)) == aid:
@@ -195,15 +201,6 @@ class Anime(aniDBabstractObject):
                     if (current_lang == "en" and not onlyMain) or current_type == "main":
                         return title.text
         return ""
-
-    @staticmethod
-    def _read_animetitels_xml(path=None):
-        if not path:
-            path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animetitles.xml")
-
-        f = open(path, "r")
-        all_anime_xml = etree.ElementTree(file=f)
-        return all_anime_xml
 
     def _builPreSequal(self):
         if self.related_aid_list and self.related_aid_type:

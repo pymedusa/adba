@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import xml.etree.cElementTree as etree
 from . import aniDBfileInfo as fileInfo
 
 

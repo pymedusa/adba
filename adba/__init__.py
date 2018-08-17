@@ -24,7 +24,7 @@ from datetime import timedelta
 from time import time, sleep
 import sys
 
-from six.moves.configparser import ConfigParser
+from configparser import ConfigParser
 from six.moves.queue import Queue
 
 from .aniDBlink import AniDBLink
