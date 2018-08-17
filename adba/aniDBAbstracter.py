@@ -17,7 +17,7 @@
 # along with aDBa.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from os import makedirs, path
+import os
 import re
 from six import string_types
 import string
@@ -104,8 +104,8 @@ class Anime(aniDBabstractObject):
 
         self.maper = AniDBMaper()
 
-        if cache_path and not path.exists(cache_path):
-            makedirs(cache_path)
+        if cache_path and not os.path.exists(cache_path):
+            os.makedirs(cache_path)
 
         self.tvDBMap = TvDBMap(cache_path)
         self.allAnimeXML = None
