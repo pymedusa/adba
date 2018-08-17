@@ -132,7 +132,7 @@ elif args.command == 'mylistadd':
             try:
                 episode = adba.Episode(connection, filePath=thisFile)
             except Exception as e:
-                print('Exception: %s', e)
+                print('Exception: %s' % e)
                 logging.debug('Exception occurred: %r', e)
                 continue
             try:
@@ -144,7 +144,7 @@ elif args.command == 'mylistadd':
                     episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
                     print(thisFile + " successfully added to AniDB MyList.")
                 except Exception as e:
-                    print('Exception: %s', e)
+                    print('Exception: %s' % e)
                     logging.debug('Exception occurred: %r', e)
                     continue
 elif args.command == 'mylistdel':  # Delete the file
@@ -153,14 +153,14 @@ elif args.command == 'mylistdel':  # Delete the file
             try:
                 episode = adba.Episode(connection, filePath=thisFile)
             except Exception as e:
-                print('Exception: %s', e)
+                print('Exception: %s' % e)
                 logging.debug('Exception occurred: %r', e)
                 continue
             try:
                 episode.delete_from_mylist()
                 print(thisFile + " successfully removed from AniDB MyList.")
             except Exception as e:
-                print('Exception: %s', e)
+                print('Exception: %s' % e)
                 logging.debug('Exception occurred: %r', e)
                 continue
 elif args.command == 'mylistaddwithfields':
@@ -178,7 +178,7 @@ elif args.command == 'mylistaddwithfields':
             try:
                 episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
             except Exception as e:
-                print('Exception: %s', e)
+                print('Exception: %s' % e)
                 logging.debug('Exception occurred: %r', e)
                 continue
             try:
@@ -190,7 +190,7 @@ elif args.command == 'mylistaddwithfields':
                     episode.add_to_mylist(state=args.state, viewed=viewed, source=args.source, storage=args.storage, other=args.other)
                     print(thisFile + " successfully added to AniDB MyList.")
                 except Exception as e:
-                    print('Exception: %s', e)
+                    print('Exception: %s' % e)
                     logging.debug('Exception occurred: %r', e)
                     continue
             print("filename\t" + thisFile)
@@ -212,7 +212,7 @@ elif args.command == 'getfields':
             try:
                 episode = adba.Episode(connection, filePath=thisFile, load=True, paramsF=requestF, paramsA=requestA)
             except Exception as e:
-                print('Exception: %s', e)
+                print('Exception: %s' % e)
                 logging.debug('Exception occurred: %r', e)
                 continue
             print("filename\t" + thisFile)
