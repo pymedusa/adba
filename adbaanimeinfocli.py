@@ -38,7 +38,7 @@ connection = adba.Connection()
 try:
     connection.auth(args.username, args.password)
 except Exception as e:
-    print('Exception: %s', e)
+    print('Exception: %s' % e)
     sys.exit(1)
 
 if connection.authed():
@@ -76,7 +76,7 @@ if connection.authed():
                 # print(getattr(animeInfo,'related_aid_list'))
     except Exception as e:
         connection.stayloggedin()
-        print('Exception: %s', e)
+        print('Exception: %s' % e)
         raise
         sys.exit(1)
 
