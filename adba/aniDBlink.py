@@ -212,7 +212,7 @@ class AniDBLink(threading.Thread):
         command.started = time()
         data = command.raw_data()
 
-        # Decode data to bytes if needed
+        # Encode data to bytes if needed
         try:
             data = data.encode("ASCII")
         except AttributeError:  # On Python 3: 'bytes' object has no attribute 'encode'
