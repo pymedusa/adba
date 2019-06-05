@@ -16,7 +16,9 @@ setup(
     url='https://github.com/pymedusa/adba',
     packages=['adba'],
     install_requires=[
-        'configparser>=3.5.0,<4.0.0;python_version<"3"'
+        'configparser >=3.5.0,<4.0.0 ; python_version < "3"',
+        'requests >= 1.16.0',
+        'six >= 1.9.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
